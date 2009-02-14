@@ -1,0 +1,28 @@
+Skip the initial empty-password check if permit_empty_passwd is disabled.  This
+doesn't change the timing profiles of the host because the additional condition
+check which can short-circuit the call to pam_authenticate() has no dependency
+on the identity of the user who is being authenticated.
+diff -up openssh-5.1p1/auth1.c.skip-initial openssh-5.1p1/auth1.c
+--- openssh-5.1p1/auth1.c.skip-initial	2008-07-09 12:54:05.000000000 +0200
++++ openssh-5.1p1/auth1.c	2008-07-23 18:26:01.000000000 +0200
+@@ -244,7 +244,7 @@ do_authloop(Authctxt *authctxt)
+ 	    authctxt->valid ? "" : "invalid user ", authctxt->user);
+ 
+ 	/* If the user has no password, accept authentication immediately. */
+-	if (options.password_authentication &&
++	if (options.permit_empty_passwd && options.password_authentication &&
+ #ifdef KRB5
+ 	    (!options.kerberos_authentication || options.kerberos_or_local_passwd) &&
+ #endif
+diff -up openssh-5.1p1/auth2-none.c.skip-initial openssh-5.1p1/auth2-none.c
+--- openssh-5.1p1/auth2-none.c.skip-initial	2008-07-02 14:56:09.000000000 +0200
++++ openssh-5.1p1/auth2-none.c	2008-07-23 18:26:01.000000000 +0200
+@@ -65,7 +65,7 @@ userauth_none(Authctxt *authctxt)
+ 	if (check_nt_auth(1, authctxt->pw) == 0)
+ 		return (0);
+ #endif
+-	if (options.password_authentication)
++	if (options.permit_empty_passwd && options.password_authentication)
+ 		return (PRIVSEP(auth_password(authctxt, "")));
+ 	return (0);
+ }

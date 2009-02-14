@@ -1,0 +1,59 @@
+From: Paul Moore <paul.moore@hp.com>
+Subject: OpenSSH: fix option handling on incoming connections
+
+OpenSSH rejects incoming connections if any IP options are present when the
+comments state that they are only concerned with source routing options.  This
+connection rejection causes problems with CIPSO which uses IP options to tag
+packets with security attributes.
+
+This patch modifies the check_ip_options() function to only fail if loose or
+strict source routing options are present, all other options are allowed.
+
+Signed-off-by: Paul Moore <paul.moore@hp.com>
+
+---
+ canohost.c |   23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+Index: openssh-4.3p2/canohost.c
+===================================================================
+--- openssh-4.3p2.orig/canohost.c
++++ openssh-4.3p2/canohost.c
+@@ -146,6 +146,7 @@ check_ip_options(int sock, char *ipaddr)
+ 	u_int i;
+ 	int ipproto;
+ 	struct protoent *ip;
++	u_int opt_iter;
+ 
+ 	if ((ip = getprotobyname("ip")) != NULL)
+ 		ipproto = ip->p_proto;
+@@ -154,13 +155,23 @@ check_ip_options(int sock, char *ipaddr)
+ 	option_size = sizeof(options);
+ 	if (getsockopt(sock, ipproto, IP_OPTIONS, options,
+ 	    &option_size) >= 0 && option_size != 0) {
+-		text[0] = '\0';
+-		for (i = 0; i < option_size; i++)
+-			snprintf(text + i*3, sizeof(text) - i*3,
+-			    " %2.2x", options[i]);
+-		fatal("Connection from %.100s with IP options:%.800s",
+-		    ipaddr, text);
++		opt_iter = 0;
++		do {
++			/* Fail, fatally, if we detect either loose or strict
++			 * source routing options. */
++			if (options[opt_iter] == 131 ||
++			    options[opt_iter] == 137)
++				goto fail;
++			opt_iter += options[opt_iter + 1] + 2;
++		} while (opt_iter < option_size);
+ 	}
++	return;
++
++fail:
++	text[0] = '\0';
++	for (i = 0; i < option_size; i++)
++		snprintf(text + i*3, sizeof(text) - i*3, " %2.2x", options[i]);
++	fatal("Connection from %.100s with IP options:%.800s", ipaddr, text);
+ #endif /* IP_OPTIONS */
+ }
+ 

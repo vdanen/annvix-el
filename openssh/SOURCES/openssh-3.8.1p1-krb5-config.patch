@@ -1,0 +1,16 @@
+Search the path for krb5-config if the prefix wasn't specified.
+--- openssh-3.8p1/configure.ac	2004-02-26 21:17:12.000000000 -0500
++++ openssh-3.8p1/configure.ac	2004-02-26 21:17:06.000000000 -0500
+@@ -2077,8 +2077,10 @@
+ 		KRB5_MSG="yes"
+ 
+ 		AC_MSG_CHECKING(for krb5-config)
+-		if test -x  $KRB5ROOT/bin/krb5-config ; then
+-			KRB5CONF=$KRB5ROOT/bin/krb5-config
++		AC_PATH_PROG([KRB5CONF],[krb5-config],
++			     [$KRB5ROOT/bin/krb5-config],
++			     [$KRB5ROOT/bin:$PATH])
++		if test -x $KRB5CONF ; then
+ 			AC_MSG_RESULT($KRB5CONF)
+ 
+ 			AC_MSG_CHECKING(for gssapi support)

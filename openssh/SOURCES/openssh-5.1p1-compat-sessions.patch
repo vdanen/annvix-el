@@ -1,0 +1,49 @@
+diff -up openssh-5.1p1/nchan.c.compat-sessions openssh-5.1p1/nchan.c
+--- openssh-5.1p1/nchan.c.compat-sessions	2008-07-02 14:32:43.000000000 +0200
++++ openssh-5.1p1/nchan.c	2008-10-17 09:40:37.000000000 +0200
+@@ -387,6 +387,8 @@ chan_send_eow2(Channel *c)
+ 		    c->self);
+ 		return;
+ 	}
++	if (!(datafellows & SSH_NEW_OPENSSH))
++		return;
+ 	packet_start(SSH2_MSG_CHANNEL_REQUEST);
+ 	packet_put_int(c->remote_id);
+ 	packet_put_cstring("eow@openssh.com");
+diff -up openssh-5.1p1/compat.c.compat-sessions openssh-5.1p1/compat.c
+--- openssh-5.1p1/compat.c.compat-sessions	2007-01-05 06:26:46.000000000 +0100
++++ openssh-5.1p1/compat.c	2008-10-17 09:40:37.000000000 +0200
+@@ -91,7 +91,8 @@ compat_datafellows(const char *version)
+ 		  "OpenSSH_3.1*",	SSH_BUG_EXTEOF|SSH_OLD_FORWARD_ADDR},
+ 		{ "OpenSSH_3.*",	SSH_OLD_FORWARD_ADDR },
+ 		{ "Sun_SSH_1.0*",	SSH_BUG_NOREKEY|SSH_BUG_EXTEOF},
+-		{ "OpenSSH*",		0 },
++		{ "OpenSSH_4*",		0 },
++		{ "OpenSSH*",		SSH_NEW_OPENSSH },
+ 		{ "*MindTerm*",		0 },
+ 		{ "2.1.0*",		SSH_BUG_SIGBLOB|SSH_BUG_HMAC|
+ 					SSH_OLD_SESSIONID|SSH_BUG_DEBUG|
+diff -up openssh-5.1p1/compat.h.compat-sessions openssh-5.1p1/compat.h
+--- openssh-5.1p1/compat.h.compat-sessions	2007-01-05 06:26:46.000000000 +0100
++++ openssh-5.1p1/compat.h	2008-10-17 09:40:37.000000000 +0200
+@@ -57,6 +57,7 @@
+ #define SSH_BUG_FIRSTKEX	0x00800000
+ #define SSH_OLD_FORWARD_ADDR	0x01000000
+ #define SSH_BUG_RFWD_ADDR	0x02000000
++#define SSH_NEW_OPENSSH		0x04000000
+ 
+ void     enable_compat13(void);
+ void     enable_compat20(void);
+diff -up openssh-5.1p1/ssh.c.compat-sessions openssh-5.1p1/ssh.c
+--- openssh-5.1p1/ssh.c.compat-sessions	2008-09-12 11:03:32.000000000 +0200
++++ openssh-5.1p1/ssh.c	2008-10-17 09:40:37.000000000 +0200
+@@ -1203,7 +1203,8 @@ ssh_session2(void)
+ 		id = ssh_session2_open();
+ 
+ 	/* If we don't expect to open a new session, then disallow it */
+-	if (options.control_master == SSHCTL_MASTER_NO) {
++	if (options.control_master == SSHCTL_MASTER_NO &&
++	    (datafellows & SSH_NEW_OPENSSH)) {
+ 		debug("Requesting no-more-sessions@openssh.com");
+ 		packet_start(SSH2_MSG_GLOBAL_REQUEST);
+ 		packet_put_cstring("no-more-sessions@openssh.com");
