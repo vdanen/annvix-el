@@ -1,0 +1,12 @@
+--- logwatch-7.2.1/conf/services/kernel.conf.pom	2006-01-04 22:06:53.000000000 +0100
++++ logwatch-7.2.1/conf/services/kernel.conf	2006-03-14 14:01:29.290219488 +0100
+@@ -20,6 +20,9 @@
+ # Only give lines pertaining to the kernel service...
+ *OnlyService = (kernel|SUNW,[-\w]+?)
+ *RemoveHeaders
++*Remove = segfault
++*Remove = locate module
++
+ 
+ ########################################################
+ # This was written and is maintained by:

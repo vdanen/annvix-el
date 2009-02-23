@@ -1,0 +1,16 @@
+--- logwatch-7.2.1/scripts/services/up2date.pom	2006-01-10 18:45:12.000000000 +0100
++++ logwatch-7.2.1/scripts/services/up2date	2006-03-24 15:02:15.000000000 +0100
+@@ -38,7 +38,12 @@
+         ( $ThisLine =~ /^Error communicating with server\.\s+The message was:$/ ) or
+         ( $ThisLine =~ /^Updating package profile/) or
+         ( $ThisLine =~ /^Unable to import repomd/) or
+-        ( $ThisLine =~ /^deleting \/var\/spool\/up2date\// ) ) { 
++        ( $ThisLine =~ /^deleting \/var\/spool\/up2date\// ) or
++	( $ThisLine =~ /^solving dep for: \[('.*')*\]/) or
++	( $ThisLine =~ /^Adding [^ ]* to bootloader config/) or
++	( $ThisLine =~ /^Modifying bootloader config to include the new kernel info/) or
++	( $ThisLine =~ /^Running elilo with the new configuration/) ) { 
++	
+       # We don't care about these
+    } elsif ( $ThisLine =~ s/^installing packages: ([^ ]+)/$1/ ) {
+       $PackageInstalled{$ThisLine}++;

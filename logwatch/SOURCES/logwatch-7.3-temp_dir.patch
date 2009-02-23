@@ -1,0 +1,99 @@
+--- logwatch-7.3/scripts/logwatch.pl.pom	2006-03-25 00:16:55.000000000 +0100
++++ logwatch-7.3/scripts/logwatch.pl	2006-05-05 11:09:19.000000000 +0200
+@@ -742,11 +742,40 @@
+ 
+ #############################################################################
+ 
++ # check for existence of previous logwatch directories
++   
++   opendir(TMPDIR, $Config{'tmpdir'}) or die "$Config{'tmpdir'} $!";
++   my @old_dirs = grep { /^logwatch\.\w{8}$/ && -d "$Config{'tmpdir'}/$_" }
++      readdir(TMPDIR);
++   if (@old_dirs) {
++      print "You have old files in your logwatch tmpdir ($Config{'tmpdir'}):\n\t";
++      print join("\n\t", @old_dirs);
++      print "\nThe directories listed above were most likely created by a\n";
++      print "logwatch run that failed to complete successfully.  If so, you\n";
++      print "may delete these directories.\n\n";
++   }
++   closedir(TMPDIR);
++						         
++   if (!-w $Config{'tmpdir'}) {
++      my $err_str = "You do not have permission to create a temporary directory";
++      $err_str .= " under $Config{'tmpdir'}.";
++      if ($> !=0) {
++          $err_str .= "  You are not running as superuser.";
++      }
++      $err_str .= "\n";
++      die $err_str;
++   }
++
+ #Set very strict permissions because we deal with security logs
+ umask 0177;
+ #Making temp dir with File::Temp  -mgt
++my $cleanup = 0;
++if ($Config{'debug'} < 100) {
++   $cleanup = 1;
++}
++		 
+ my $TempDir = tempdir( 'logwatch.XXXXXXXX', DIR => $Config{tmpdir},
+-      CLEANUP => 0 );
++      CLEANUP => $cleanup );
+ 
+ if ($Config{'debug'}>7) {
+       print "\nMade Temp Dir: " . $TempDir . " with tempdir\n";
+@@ -839,11 +868,11 @@
+          #These system calls are not secure but we are getting closer
+          #What needs to go is all the pipes and instead we need a command loop
+          #For each filter to apply -mgt
+-            my $arguments = "$Archive 2>/dev/null >> $DestFile";
++            my $arguments = "$Archive >> $DestFile";
+             system("$Config{'pathtozcat'} $arguments") == 0
+                or die "system $Config{'pathtozcat'} failed: $?" 
+          } elsif (-e "$Archive") {
+-            my $arguments = "$Archive 2>/dev/null >> $DestFile";
++            my $arguments = "$Archive >> $DestFile";
+             system("$Config{'pathtocat'} $arguments") == 0
+                or die "system $Config{'pathtocat'} failed: $?" 
+          } #End if/elsif existence
+@@ -855,6 +884,14 @@
+    foreach my $ThisFile (@FileList) {
+       #Existence check for files -mgt
+       next unless (-e $ThisFile);
++      if (! -r $ThisFile) {
++         print "File $ThisFile is not readable.  Check permissions.";
++         if ($> != 0) {
++            print "  You are not running as superuser.";
++	 }
++         print "\n";
++	 next;
++      }
+       $FileText .= ($ThisFile . " ");
+    } #End foreach ThisFile
+ 
+@@ -902,7 +939,7 @@
+       closedir (LOGDIR);
+    }
+ 
+-   #Instead of trying to cat non-existant logs we test for it above -mgt
++   #Instead of trying to cat non-existent logs we test for it above -mgt
+    if ($FileText) {
+       my $Command = $FileText . $FilterText . ">" . $TempDir . $LogFile;
+       if ($Config{'debug'}>4) {
+@@ -1268,16 +1305,6 @@
+ close(OUTFILE) unless ($Config{'print'} eq 1);
+ #############################################################################
+ 
+-# Get rid of temp directory...
+-if ($Config{'debug'}<100) {
+-   opendir(TEMPDIR, $TempDir);
+-   my @files = grep(!/^\./, readdir(TEMPDIR));
+-   closedir(TEMPDIR);
+-
+-   for my $tempfile (@files) { unlink "$TempDir/$tempfile"; };
+-   rmdir $TempDir;
+-}
+-
+ exit(0);
+ 
+ sub output {

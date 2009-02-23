@@ -1,0 +1,13 @@
+--- logwatch-7.3/scripts/services/secure.pom	2006-03-20 21:42:57.000000000 +0100
++++ logwatch-7.3/scripts/services/secure	2006-06-23 15:55:46.000000000 +0200
+@@ -161,8 +161,8 @@
+       ( $ThisLine =~ /^cyrus\/lmtpd\[\d+\]: [^ ]+ server step [12]/ ) or
+       ( $ThisLine =~ /^cyrus\/imapd\[\d+\]: [^ ]+ server step [12]/ ) or
+       ( $ThisLine =~ /pam_timestamp: updated timestamp file/) or
+-      ( $ThisLine =~ /pam_timestamp: timestamp file `([^ ]+)' is only \d+ seconds old, allowing access to ([^ ]+) for user ([^ ]+)/) or
+-      ( $ThisLine =~ /pam_timestamp: timestamp file `([^ ]+)' has unacceptable age \(\d+ seconds\), disallowing access to ([^ ]+) for user ([^ ]+)/) or
++      ( $ThisLine =~ /pam_timestamp\(?[^ ]*\)?: timestamp file `([^ ]+)' is only \d+ seconds old, allowing access to ([^ ]+) for user ([^ ]+)/) or
++      ( $ThisLine =~ /pam_timestamp\(?[^ ]*\)?: timestamp file `([^ ]+)'/) or # has unacceptable age \(\d+ seconds\), disallowing access to ([^ ]+) for user ([^ ]+)/) or
+       ( $ThisLine =~ /userhelper\[\d+\]: running '([^ ]+)' with [^ ]+ context/) or
+       ( $ThisLine =~ /pam_timestamp\(.*:session\): updated timestamp file `\/var\/run\/sudo.*'/)   
+    ) {

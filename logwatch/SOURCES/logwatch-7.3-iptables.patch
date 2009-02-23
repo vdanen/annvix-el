@@ -1,0 +1,13 @@
+--- logwatch-7.3/scripts/services/iptables.ipt	2006-01-16 19:40:31.000000000 +0100
++++ logwatch-7.3/scripts/services/iptables	2006-08-14 18:06:02.000000000 +0200
+@@ -107,8 +107,8 @@
+    elsif (($chain,$ifin,$ifout,$fromip,$toip,$proto,$rest) = ($ThisLine =~ /^(.*?)\s*IN=(\w*).*?OUT=(\w*).*?SRC=([\w\.:]+).*?DST=([\w\.:]+).*?PROTO=(\w+)(.*)/ )) {
+ 
+       # get a destination port number  (or icmp type) if there is one
+-      if (! ( ($toport) = ( $rest =~ /DPT=(\w+)/ ) ) ) {
+-         if (! ( ($toport) = ( $rest =~ /TYPE=(\w+)/ ) ) ) {
++      if (! ( ($toport) = ( $rest =~ /TYPE=(\w+)/ ) ) ) {
++         if (! ( ($toport) = ( $rest =~ /DPT=(\w+)/ ) ) ) {
+             $toport = 0;
+          }
+       }

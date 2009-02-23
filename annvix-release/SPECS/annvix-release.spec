@@ -68,4 +68,4 @@ rpm -q gpg-pubkey-65d5605c-49988ded &>/dev/null || rpm --import %{_sysconfdir}/p
 * Tue Feb 17 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.1-1
 - first Annvix build
 
-# vim: expandtab:shiftwidth=8:tabstop=8:softtabstop=8
+# vim:set et ts=8 sw=8 list listchars=tab\:>-,trail\:.:
