@@ -1,0 +1,11 @@
+--- logwatch-7.3.6/scripts/services/secure.avx	2007-04-28 17:56:32.000000000 -0600
++++ logwatch-7.3.6/scripts/services/secure	2009-02-22 20:25:30.000000000 -0700
+@@ -203,7 +203,7 @@ while (defined($ThisLine = <STDIN>)) {
+       ( $ThisLine =~ /^cyrus\/imapd\[\d+\]: [^ ]+ server step [12]/ ) or
+       ( $ThisLine =~ /pam_timestamp: updated timestamp file/) or
+       ( $ThisLine =~ /pam_timestamp\(?[^ ]*\)?: timestamp file `([^ ]+)' is only \d+ seconds old, allowing access to ([^ ]+) for user ([^ ]+)/) or
+-      ( $ThisLine =~ /pam_timestamp\(?[^ ]*\)?: timestamp file `([^ ]+)' (has unacceptable age \(\d+ seconds\)|is older than oldest login), disallowing access to ([^ ]+) for user ([^ ]+)/) or
++      ( $ThisLine =~ /pam_timestamp\(?[^ ]*\)?: timestamp file `([^ ]+)'/) or # has unacceptable age \(\d+ seconds\), disallowing access to ([^ ]+) for user ([^ ]+)/) or
+       ( $ThisLine =~ /userhelper\[\d+\]: running '([^ ]+)' with [^ ]+ context/) or
+       ( $ThisLine =~ /pam_timestamp\(.*:session\): updated timestamp file `\/var\/run\/sudo.*'/) or
+       ( $ThisLine =~ /[^ ]*: pam_keyinit(.*:.*): Unable to change GID to [0-9]* temporarily/) or 
