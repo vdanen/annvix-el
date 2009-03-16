@@ -10,7 +10,7 @@
 Summary:	Annvix release file and package configuration
 Name:		annvix-release
 Version:	1.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 Group:		System Environment/Base
 URL:		http://annvix.org/
@@ -52,6 +52,7 @@ install -Dp -m0644 annvix.yum %{buildroot}%{_sysconfdir}/yum.repos.d/annvix.repo
 
 %clean
 rm -rf %{buildroot}
+rm -f annvix.yum
 
 
 %post
@@ -65,6 +66,9 @@ rpm -q gpg-pubkey-65d5605c-49988ded &>/dev/null || rpm --import %{_sysconfdir}/p
 
 
 %changelog
+* Mon Mar 16 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.1-2
+- clean up the created yum repository file
+
 * Tue Feb 17 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.1-1
 - first Annvix build
 
