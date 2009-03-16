@@ -1,0 +1,88 @@
+# Makefile for annvix-release
+# $Id$
+
+NAME := annvix-release
+SPECFILE = $(firstword $(wildcard *.spec))
+
+# the base directory where patches, sources, and specs are stored
+ifndef WORKDIR
+WORKDIR := $(shell pwd)
+endif
+ifndef SOURCEDIR
+SOURCEDIR := $(shell pwd)
+endif
+ifndef SPECDIR
+SPECDIR := $(shell pwd)
+endif
+
+# these can be overridden with rpmmacros
+SRCRPMDIR ?= $(WORKDIR)
+BUILDDIR ?= $(WORKDIR)
+RPMDIR ?= $(WORKDIR)
+RPM := rpmbuild
+ARCH = $(shell uname -m)
+
+RPM_DEFINES = $(RPM) --define "_sourcedir $(SOURCEDIR)" \
+	--define "_builddir $(BUILDDIR)" \
+	--define "_srcrpmdir $(SRCRPMDIR)" \
+	--define "_rpmdir $(RPMDIR)"
+
+VER_REL := $(shell rpm -q --qf "%{VERSION} %{RELEASE}\n" --specfile $(SPECFILE) | head -1)
+
+RPM_SIGN_SCRIPT := /home/vdanen/bin/resign
+
+ifndef NAME
+$(error "You cannot run this Makefile without having NAME defined")
+endif
+ifndef VERSION
+VERSION := $(word 1, $(VER_REL))
+endif
+ifndef RELEASE
+RELEASE := $(word 2, $(VER_REL))
+endif
+ifndef BUILDARCH
+BUILDARCH := $(shell rpm --eval "%{_arch}")
+endif
+
+#LOCALARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)), noarch, $(shell uname -m))
+LOCALARCH = $(BUILDARCH)
+
+RPM_BUILD_DIR ?= $(BUILDDIR)/$(NAME)-$(VERSION)
+
+all: build sign lint
+
+build:
+	$(RPM_DEFINES) -ba $(SPECFILE) 2>&1 | tee build.log
+
+srpm:
+	$(RPM_DEFINES) --nodeps -bs $(SPECFILE)
+
+prep:
+	$(RPM_DEFINES) -bp $(SPECFILE)
+
+compile:
+	$(RPM_DEFINES) -bc $(SPECFILE)
+
+install:
+	$(RPM_DEFINES) -bi $(SPECFILE)
+
+compile-short:
+	$(RPM_DEFINES) -bc --short-circuit $(SPECFILE)
+
+install-short:
+	$(RPM_DEFINES) -bi --short-circuit $(SPECFILE)
+
+verrel:
+	@echo $(NAME)-$(VERSION)-$(RELEASE)
+
+lint:
+	@test -e $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "run 'make local' first!" ; exit 1 )
+	rpmlint $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH)/*-$(VERSION)-$(RELEASE).$(LOCALARCH).rpm
+
+sign:
+	@test -e $(RPM_SIGN_SCRIPT) || (echo "only authorized persons can sign rpms!" ; exit 1 )
+	@test -e $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "run 'make local' first!" ; exit 1 )
+	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH)/*-$(VERSION)-$(RELEASE).$(LOCALARCH).rpm; do resign $$name; done)
+
+clean:
+	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH) build.log
