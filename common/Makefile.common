@@ -1,9 +1,6 @@
 # Makefile for annvix-release
 # $Id$
 
-NAME := annvix-release
-SPECFILE = $(firstword $(wildcard *.spec))
-
 # the base directory where patches, sources, and specs are stored
 ifndef WORKDIR
 WORKDIR := $(shell pwd)
