@@ -38,7 +38,8 @@ ifndef RELEASE
 RELEASE := $(word 2, $(VER_REL))
 endif
 ifndef BUILDARCH
-BUILDARCH := $(shell rpm --eval "%{_arch}")
+BUILDARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)),noarch, $(shell rpm --eval "%{_arch}"))
+#BUILDARCH := $(shell rpm --eval "%{_arch}")
 endif
 
 #LOCALARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)), noarch, $(shell uname -m))
@@ -82,4 +83,4 @@ sign:
 	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH)/*-$(VERSION)-$(RELEASE).$(LOCALARCH).rpm; do resign $$name; done)
 
 clean:
-	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH) build.log
+	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH) build.log $(NAME)-$(VERSION)
