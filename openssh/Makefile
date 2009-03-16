@@ -1,7 +1,7 @@
 # Makefile for openssh 
 # $Id$
 
-NAME := openssh 
+NAME := openssh
 SPECFILE = $(firstword $(wildcard *.spec))
 
 define find-makefile-common
