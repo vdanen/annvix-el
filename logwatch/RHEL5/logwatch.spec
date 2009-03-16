@@ -22,7 +22,7 @@ Patch13: logwatch-7.3.6-avx-oldfiles.patch
 
 Requires: textutils sh-utils grep mailx
 BuildRoot: %{_tmppath}/logwatch-build
-BuildArchitectures: noarch
+BuildArch: noarch
 
 %description
 Logwatch is a customizable, pluggable log-monitoring system.  It will go
