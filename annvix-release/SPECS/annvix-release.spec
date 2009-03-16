@@ -15,7 +15,7 @@ License:	GPL
 Group:		System Environment/Base
 URL:		http://annvix.org/
 
-Packager:	Vincent Danen <vdanen_at_annvix.org>
+Packager:	Vincent Danen <vdanen@annvix.org>
 Vendor:		Annvix [http://annvix.org/]
 
 Source0:	RPM-GPG-KEY-annvix
