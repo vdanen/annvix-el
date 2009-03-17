@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+# Chmouel Boudjnah <chmouel@mandrakesoft.com>
+# 	$rcs = ' $Id: resign 64 2005-11-03 21:05:12Z vdanen $ ' ;	
+
+# **** need to re-work so it can handle multiple files at the same time
+
+use Expect;
+
+my $file = $ENV{HOME} . "/.gnupg/.signature.gpg";
+my @corrupted;
+my $verbose;
+if ($ARGV[0] =~ /-v/) {
+	$verbose = 1;
+	shift;
+}
+
+foreach $rpm_files (@ARGV) {
+
+    print "Signing $rpm_files...\n";
+    system("rpm -K $rpm_files &> /dev/null");
+    if ("$?" != 0) {
+		$error = `rpm -K $rpm_files`;
+		if ($error =~ "MISSING KEYS")
+		{
+			#nothing
+		} else {
+			push @corrupted, $rpm_files;
+			print "Corrupted: $rpm_files\n";
+			next;
+		}
+    }
+    
+    $password = `cat $file`;    
+    $command = Expect->spawn("rpm --resign $rpm_files") or die "Couldn't start rpm: $!\n";
+
+    $command->log_stdout(1);
+
+    print "Resigning: $rpm_files\n" if $verbose;
+    unless (($command->expect(5, -re => 'Enter pass phrase: '))) {};
+
+    print $command "$password\n";
+    $command->soft_close();
+#    system("chown qateam.qateam $rpm_files");
+    exit 0;
+}

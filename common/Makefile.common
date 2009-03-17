@@ -26,7 +26,17 @@ RPM_DEFINES = $(RPM) --define "_sourcedir $(SOURCEDIR)" \
 
 VER_REL := $(shell rpm -q --qf "%{VERSION} %{RELEASE}\n" --specfile $(SPECFILE) | head -1)
 
-RPM_SIGN_SCRIPT := /home/vdanen/bin/resign
+ifndef RPM_SIGN_SCRIPT
+RPM_SIGN_SCRIPT := /home/vdanen/svn/el/trunk/common/resign
+endif
+
+ifndef MOVE_SCRIPT
+MOVE_SCRIPT := /home/vdanen/svn/el/trunk/common/move-packages
+endif
+
+ifndef REPO_SCRIPT
+REPO_SCRIPT := /home/vdanen/svn/el/trunk/common/update-repository
+endif
 
 ifndef NAME
 $(error "You cannot run this Makefile without having NAME defined")
@@ -37,13 +47,12 @@ endif
 ifndef RELEASE
 RELEASE := $(word 2, $(VER_REL))
 endif
-ifndef BUILDARCH
-BUILDARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)),noarch, $(shell rpm --eval "%{_arch}"))
-#BUILDARCH := $(shell rpm --eval "%{_arch}")
-endif
 
-#LOCALARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)), noarch, $(shell uname -m))
-LOCALARCH = $(BUILDARCH)
+LOCALARCH := $(shell rpm --eval "%{_arch}")
+
+ifndef BUILDARCH
+BUILDARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)),noarch,$(LOCALARCH))
+endif
 
 RPM_BUILD_DIR ?= $(BUILDDIR)/$(NAME)-$(VERSION)
 
@@ -75,12 +84,19 @@ verrel:
 
 lint:
 	@test -e $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "run 'make local' first!" ; exit 1 )
-	rpmlint $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH)/*-$(VERSION)-$(RELEASE).$(LOCALARCH).rpm
+	rpmlint $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm
 
 sign:
 	@test -e $(RPM_SIGN_SCRIPT) || (echo "only authorized persons can sign rpms!" ; exit 1 )
 	@test -e $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "run 'make local' first!" ; exit 1 )
-	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH)/*-$(VERSION)-$(RELEASE).$(LOCALARCH).rpm; do resign $$name; done)
+	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm; do resign $$name; done)
 
 clean:
-	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(LOCALARCH) build.log $(NAME)-$(VERSION)
+	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH) build.log $(NAME)-$(VERSION)
+
+move:
+	$(MOVE_SCRIPT) $(DIST) $(LOCALARCH) $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm
+
+update-repo:
+	$(REPO_SCRIPT) $(DIST) $(LOCALARCH)
+

@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# script to update the yum repository
+#
+# $Id$
+
+distrib=${1}
+arch=${2}
+
+repo_home="${HOME}/build/${distrib}"
+
+function usage() {
+    echo "Usage: ${0} [distrib] [arch]"
+    exit 1
+}
+
+if [ "${distrib}" == "" ]; then
+    usage
+fi
+if [ "${arch}" == "" ]; then
+    usage
+fi
+
+if [ ! -d ${repo_home} ]; then
+    echo "${repo_home} does not exist!  Aborting!"
+    exit 1
+fi
+
+pushd ${repo_home}/${arch} >/dev/null 2>&1
+    createrepo .
+popd >/dev/null 2>&1

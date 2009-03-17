@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# script to move packages from subversion to the repository
+#
+# $Id$
+
+distrib=${1}
+shift
+arch=${1}
+shift
+files=$*
+
+repo_home="${HOME}/build/${distrib}"
+
+function usage() {
+    echo "Usage: ${0} [distrib] [arch] [files] [...]"
+    exit 1
+}
+
+if [ "${distrib}" == "" ]; then
+    usage
+fi
+if [ "${arch}" == "" ]; then
+    usage
+fi
+if [ "${files}" == "" ]; then
+    usage
+fi
+
+if [ ! -d ${repo_home} ]; then
+    echo "${repo_home} does not exist!  Aborting!"
+    exit 1
+fi
+
+for file in ${files}
+do
+    if [ "$(rpm -K ${file} | grep -q 'gpg OK'; echo $?)" != "0" ]; then
+        echo "ERROR: Package (${file}) is not signed!  Run 'make sign' first!  Aborting!"
+        exit 1
+    fi
+
+    file_replace=""
+    if [ "$(file ${file} | awk '{print $4}')" == "bin" ]; then
+        destdir="${repo_home}/${arch}"
+    elif [ "$(file ${file} | awk '{print $4}')" == "src" ]; then
+        destdir="${repo_home}/SRPMS"
+    else
+        echo "File (${file}) is not an RPM file!"
+        continue
+    fi
+    NAME=$(rpm -qp --qf '%{NAME}\n' ${file})
+    for replace in $(ls -1 ${destdir}/*.rpm)
+    do
+        ONAME=$(rpm -qp --qf '%{NAME}\n' ${replace})
+        if [ "${NAME}" == "${ONAME}" ]; then
+            file_replace="${replace}"
+        fi
+    done
+    if [ "${file_replace}" != "" ]; then
+        echo "Replacing ${file_replace} with ${file}..."
+        rm -f ${file_replace}
+    else
+        echo "Adding new file ${file}..."
+    fi
+    mv -f ${file} ${destdir}/
+done
+
