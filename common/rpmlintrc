@@ -1,0 +1,15 @@
+setOption('Vendor', 'Annvix [http://annvix.org/]')
+setOption('Distribution', 'Annvix')
+setOption('ReleaseExtension', 'avx')
+#
+# package-specific options
+#
+setOption('UseBzip2', 1)
+setOption('Packager', '@annvix.org')
+setOption('ValidBuildHost', 'annvix\.ca$')
+
+#
+# filters
+#
+addFilter('W: .* source-or-patch-not-bzipped')
+addFilter('W: .* manpage-not-bzipped')

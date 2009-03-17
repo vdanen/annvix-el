@@ -89,7 +89,7 @@ lint:
 sign:
 	@test -e $(RPM_SIGN_SCRIPT) || (echo "only authorized persons can sign rpms!" ; exit 1 )
 	@test -e $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "run 'make local' first!" ; exit 1 )
-	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm; do resign $$name; done)
+	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm; do $(RPM_SIGN_SCRIPT) $$name; done)
 
 clean:
 	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH) build.log $(NAME)-$(VERSION)

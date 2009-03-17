@@ -1,0 +1,9 @@
+%dist		.el5.avx
+%packager	Vincent Danen <vdanen@annvix.org>
+%vendor		Annvix [http://annvix.org/]
+%distribution	Red Hat Linux
+
+%_signature	gpg
+%_gpg_name	Annvix Development Key <annvix@annvix.org>
+
+%_topdir	/home/vdanen/build/redhat
