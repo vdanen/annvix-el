@@ -100,3 +100,21 @@ move:
 update-repo:
 	$(REPO_SCRIPT) $(DIST) $(LOCALARCH)
 
+help:
+	@echo "Usage: make <target>"
+	@echo "Available targets are:"
+	@echo "help			Show this text"
+	@echo "build			Build local RPMs"
+	@echo "srpm			Build local SRPM"
+	@echo "prep			Rpmbuild prep (-bp)"
+	@echo "compile			Rpmbuild compile (-bc)"
+	@echo "install			Rpmbuild install (-bi)"
+	@echo "compile-short		Rpmbuild compile short-circuit (-bc --short-circuit)"
+	@echo "install-short		Rpmbuild install short-circuit (-bi --short-circuit)"
+	@echo "verrel			Display name-version-release"
+	@echo "lint			Run rpmlint on built packages"
+	@echo "sign			GPG sign local packages"
+	@echo "clean			Clean build directory, temporary files"
+	@echo "move			Move packages into repository"
+	@echo "update-repo		Update repository meta-data"
+
