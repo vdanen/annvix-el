@@ -100,6 +100,10 @@ move:
 update-repo:
 	$(REPO_SCRIPT) $(DIST) $(LOCALARCH)
 
+install-deps: srpm
+	@test -e /usr/bin/yum-builddep || (echo "you must install yum-utils to use this command!" ; exit 1 )
+	@sudo yum-builddep $(NAME)-$(VERSION)-$(RELEASE).src.rpm || (echo "you must have sudo access to yum-builddep to use this command!" ; exit 1 )
+
 help:
 	@echo "Usage: make <target>"
 	@echo "Available targets are:"
@@ -117,4 +121,5 @@ help:
 	@echo "clean			Clean build directory, temporary files"
 	@echo "move			Move packages into repository"
 	@echo "update-repo		Update repository meta-data"
+	@echo "install-deps		Install build requirements for this build (requires sudo access to yum-builddep)"
 
