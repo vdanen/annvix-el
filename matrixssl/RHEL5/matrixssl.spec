@@ -92,7 +92,7 @@ install -d %{buildroot}%{_libdir}
 
 # install the glibc version
 install -m 0755 src/lib%{name}.so %{buildroot}%{_libdir}/lib%{name}.so.%{version}
-ln -snf lib%{name}.so.%{version} %{buildroot}%{_libdir}/lib%{name}.so.%{major}
+ln -snf lib%{name}.so.%{version} %{buildroot}%{_libdir}/lib%{name}.so.1
 ln -snf lib%{name}.so.%{version} %{buildroot}%{_libdir}/lib%{name}.so
 install -m 0644 src/lib%{name}.a %{buildroot}%{_libdir}/
 install -m 0644 matrixSsl.h %{buildroot}%{_includedir}/
