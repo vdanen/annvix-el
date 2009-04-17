@@ -1,0 +1,123 @@
+--- dietlibc-0.29/Makefile.biarch	2006-04-20 14:10:57.000000000 +0200
++++ dietlibc-0.29/Makefile	2006-04-20 14:11:17.000000000 +0200
+@@ -24,6 +24,7 @@ ARCH=ppc
+ else
+ ifeq ($(MYARCH),ppc64)
+ ARCH=ppc64
++ARCH32=ppc
+ else
+ ifeq ($(MYARCH),arm)
+ ARCH=arm
+@@ -52,6 +53,7 @@ MYARCH=parisc
+ else
+ ifeq ($(MYARCH),x86_64)
+ ARCH=x86_64
++ARCH32=i386
+ else
+ ifeq ($(MYARCH),ia64)
+ ARCH=ia64
+@@ -85,16 +87,23 @@ ILIBDIR=$(INSTALLHOME)/lib-$(ARCH)
+ 
+ HOME=$(shell pwd)
+ 
+-WHAT=	$(OBJDIR) $(OBJDIR)/start.o $(OBJDIR)/dyn_start.o $(OBJDIR)/dyn_stop.o \
++LIBS=	$(OBJDIR) $(OBJDIR)/start.o $(OBJDIR)/dyn_start.o $(OBJDIR)/dyn_stop.o \
+ 	$(OBJDIR)/dietlibc.a $(OBJDIR)/liblatin1.a \
+ 	$(OBJDIR)/libcompat.a $(OBJDIR)/libm.a \
+ 	$(OBJDIR)/librpc.a $(OBJDIR)/libpthread.a \
+-	$(OBJDIR)/libcrypt.a \
+-	$(OBJDIR)/diet $(OBJDIR)/diet-i $(OBJDIR)/elftrunc \
+-	$(OBJDIR)/dnsd
++	$(OBJDIR)/libcrypt.a
+ 
+-all: $(WHAT)
++all: all_32 libs $(OBJDIR)/diet $(OBJDIR)/diet-i $(OBJDIR)/elftrunc $(OBJDIR)/dnsd
+ 
++libs: $(LIBS)
++
++ifeq (,$(ARCH32))
++all_32:
++else
++all_32:
++	$(MAKE) MYARCH=$(ARCH32) CC="$(CC) -m32" libs
++endif
++	
+ profiling: $(OBJDIR)/libgmon.a $(OBJDIR)/pstart.o
+ 
+ CFLAGS=-pipe -nostdinc
+@@ -340,17 +349,26 @@ t:
+ t1:
+ 	$(CROSS)$(CC) -g -o t1 t.c
+ 
+-install: $(OBJDIR)/start.o $(OBJDIR)/dietlibc.a $(OBJDIR)/librpc.a $(OBJDIR)/liblatin1.a $(OBJDIR)/libcompat.a $(OBJDIR)/elftrunc $(OBJDIR)/diet-i
+-	$(INSTALL) -d $(DESTDIR)$(ILIBDIR) $(DESTDIR)$(MAN1DIR) $(DESTDIR)$(BINDIR)
++install_libs: $(OBJDIR)/start.o $(OBJDIR)/dietlibc.a $(OBJDIR)/librpc.a $(OBJDIR)/liblatin1.a $(OBJDIR)/libcompat.a
++	$(INSTALL) -d $(DESTDIR)$(ILIBDIR)
+ 	$(INSTALL) $(OBJDIR)/start.o $(DESTDIR)$(ILIBDIR)/start.o
+ 	$(INSTALL) -m 644 $(OBJDIR)/libm.a $(OBJDIR)/libpthread.a $(OBJDIR)/librpc.a \
+ $(OBJDIR)/liblatin1.a $(OBJDIR)/libcompat.a $(OBJDIR)/libcrypt.a $(DESTDIR)$(ILIBDIR)
+ 	$(INSTALL) -m 644 $(OBJDIR)/dietlibc.a $(DESTDIR)$(ILIBDIR)/libc.a
++
++ifeq (,$(ARCH32))
++install_32:
++else
++install_32:
++	$(MAKE) MYARCH=$(ARCH32) CC="$(CC) -m32" install_libs
++endif
++
++install: install_32 install_libs $(OBJDIR)/elftrunc $(OBJDIR)/diet-i
++	$(INSTALL) -d $(DESTDIR)$(MAN1DIR) $(DESTDIR)$(BINDIR)
+ ifeq ($(MYARCH),$(ARCH))
+ 	$(INSTALL) $(OBJDIR)/diet-i $(DESTDIR)$(BINDIR)/diet
+ 	-$(INSTALL) $(PICODIR)/diet-dyn-i $(DESTDIR)$(BINDIR)/diet-dyn
+ endif
+-	$(INSTALL) -m 755 $(OBJDIR)/elftrunc $(OBJDIR)/dnsd $(DESTDIR)$(BINDIR)
+ 	-$(INSTALL) $(OBJDIR)/pstart.o $(OBJDIR)/libgmon.a $(OBJDIR)/dyn_start.o $(OBJDIR)/dyn_stop.o $(DESTDIR)$(ILIBDIR)
+ 	-$(INSTALL) $(PICODIR)/libc.so $(DESTDIR)$(ILIBDIR)/libc.so
+ 	-$(INSTALL) $(PICODIR)/libpthread.so $(DESTDIR)$(ILIBDIR)/libpthread.so
+--- dietlibc-0.29/diet.c.biarch	2005-05-18 16:38:55.000000000 +0200
++++ dietlibc-0.29/diet.c	2006-04-20 14:10:57.000000000 +0200
+@@ -71,6 +71,7 @@ int main(int argc,char *argv[]) {
+   int shared=0;
+ #endif
+   char* shortplatform=0;
++  char* shortplatform32=0;
+ #ifdef WANT_SAFEGUARD
+   char safeguard1[]="-include";
+   char* safeguard2;
+@@ -155,6 +156,7 @@ int main(int argc,char *argv[]) {
+ #endif
+ #ifdef __powerpc64__
+       shortplatform="ppc64";
++      shortplatform32="ppc";
+ #endif
+ #ifdef __i386__
+       shortplatform="i386";
+@@ -182,11 +184,26 @@ int main(int argc,char *argv[]) {
+       shortplatform="parisc";
+ #endif
+ #ifdef __x86_64__
+-      shortplatform=(m==32?"i386":"x86_64");
++      shortplatform="x86_64";
++      shortplatform32="i386";
+ #endif
+ #ifdef __ia64__
+       shortplatform="ia64";
+ #endif
++	/* Check for -m32 on biarch platforms */
++	/* NOTE: though it's wrong to pass both -m32/-m64 flags to
++	 * gcc at once, we pick up the last one only */
++      if (shortplatform32) {
++	      int i, m64=1;
++	      for (i=0; i<argc; ++i) {
++		      if (!strcmp(argv[i],"-m32"))
++			      m64=0;
++		      else if (!strcmp(argv[i],"-m64"))
++			      m64=1;
++	      }
++	      if (!m64)
++		      shortplatform=shortplatform32;
++      }
+       {
+ 	char *tmp=platform+strlen(platform);
+ 	strcpy(tmp,shortplatform);

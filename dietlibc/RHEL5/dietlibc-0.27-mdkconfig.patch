@@ -1,0 +1,50 @@
+--- dietlibc-0.27/Makefile.mdkconfig	2004-12-14 18:54:27.318430678 -0500
++++ dietlibc-0.27/Makefile	2004-12-14 18:54:44.623921567 -0500
+@@ -1,13 +1,9 @@
+ INSTALL=install
+-prefix?=/opt/diet
++prefix?=/usr
+ # Set the following to install to a different root
+ #DESTDIR=/tmp/fefix
+ # Use "make DEBUG=1" to compile a debug version.
+ 
+-LIBDIR=${prefix}/lib
+-BINDIR=${prefix}/bin
+-MAN1DIR=${prefix}/man/man1
+-
+ MYARCH:=$(shell uname -m | sed -e 's/i[4-9]86/i386/' -e 's/armv[3-6][lb]/arm/')
+ 
+ # This extra-ugly cruft is here so make will not run uname and sed each
+@@ -81,8 +77,13 @@ endif
+ 
+ # ARCH=$(MYARCH)
+ 
++LIBDIR=${prefix}/lib
++BINDIR=${prefix}/bin
++MAN1DIR=${prefix}/share/man/man1
++INSTALLHOME=$(LIBDIR)/dietlibc
++
+ OBJDIR=bin-$(ARCH)
+-ILIBDIR=$(LIBDIR)-$(ARCH)
++ILIBDIR=$(INSTALLHOME)/lib-$(ARCH)
+ 
+ HOME=$(shell pwd)
+ 
+@@ -283,7 +284,7 @@ $(OBJDIR)/diet: $(OBJDIR)/start.o $(OBJD
+ 	$(CROSS)strip -R .comment -R .note $@
+ 
+ $(OBJDIR)/diet-i: $(OBJDIR)/start.o $(OBJDIR)/dyn_start.o diet.c $(OBJDIR)/dietlibc.a $(OBJDIR)/dyn_stop.o
+-	$(CROSS)$(CC) -isystem include $(CFLAGS) -nostdlib -o $@ $^ -DDIETHOME=\"$(prefix)\" -DVERSION=\"$(VERSION)\" -DINSTALLVERSION -lgcc
++	$(CROSS)$(CC) -isystem include $(CFLAGS) -nostdlib -o $@ $^ -DDIETHOME=\"$(INSTALLHOME)\" -DVERSION=\"$(VERSION)\" -DINSTALLVERSION -lgcc
+ 	$(CROSS)strip -R .comment -R .note $@
+ 
+ $(PICODIR)/diet-dyn: $(PICODIR)/start.o $(PICODIR)/dyn_start.o diet.c
+@@ -347,7 +348,7 @@ endif
+ 	-$(INSTALL) $(PICODIR)/dstart.o $(PICODIR)/dyn_so_start.o $(DESTDIR)$(ILIBDIR)
+ 	$(INSTALL) -m 644 diet.1 $(DESTDIR)$(MAN1DIR)/diet.1
+ 	if test -f $(PICODIR)/libc.so -a ! -f $(DESTDIR)/etc/diet.ld.conf; then echo "$(ILIBDIR)" > $(DESTDIR)/etc/diet.ld.conf; fi
+-	for i in `find include -name \*.h`; do install -m 644 -D $$i $(DESTDIR)$(prefix)/$$i; done
++	for i in `find include -name \*.h`; do install -m 644 -D $$i $(DESTDIR)$(INSTALLHOME)/$$i; done
+ 
+ uninstall:
+ 	for i in start.o libm.a libpthread.a librpc.a liblatin1.a libcompat.a libcrypt.a libc.a; do rm -f $(DESTDIR)$(ILIBDIR)/$$i; done

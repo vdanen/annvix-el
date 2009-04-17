@@ -1,0 +1,11 @@
+--- dietlibc-0.30/lib/__fstatfs64.c~	2005-10-04 21:48:30 +0400
++++ dietlibc-0.30/lib/__fstatfs64.c	2006-08-29 00:16:48 +0400
+@@ -17,7 +17,7 @@ int fstatfs64(int fd, struct statfs64 *_
+   }
+   return 0;
+ #else
+-  return __dietlibc_fstatfs64(fd,sizeof(*__buf),buf);
++  return __dietlibc_fstatfs64(fd,sizeof(*__buf),__buf);
+ #endif
+ }
+ #endif

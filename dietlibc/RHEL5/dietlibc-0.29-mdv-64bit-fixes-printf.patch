@@ -1,0 +1,42 @@
+2006-04-26  Gwenole Beauchesne  <gbeauchesne@mandriva.com>
+
+	* lib/__v_printf.c (__v_printf): Fix *printf("%u") with 32-bit
+	values with MSB set on 64-bit platforms.
+
+--- dietlibc-0.29/test/test-printf.c.64bit-fixes-printf	2007-05-04 15:01:34.000000000 +0200
++++ dietlibc-0.29/test/test-printf.c	2007-05-04 15:01:34.000000000 +0200
+@@ -0,0 +1,19 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++int main(void)
++{
++  char str[32];
++  const unsigned int val = 0xea2c1a52;
++
++  sprintf(str, "%u", val);
++  if (strcmp(str, "3928758866") != 0)
++    abort();
++
++  sprintf(str, "%08x", val);
++  if (strcmp(str, "ea2c1a52") != 0)
++    abort();
++
++  return 0;
++}
+--- dietlibc-0.29/lib/__v_printf.c.64bit-fixes-printf	2005-04-10 15:59:32.000000000 +0200
++++ dietlibc-0.29/lib/__v_printf.c	2007-05-04 15:01:34.000000000 +0200
+@@ -264,8 +264,11 @@ num_printf:
+ #endif
+ 	    number=va_arg(arg_ptr,long);
+ 	}
+-	else
++	else {
+ 	  number=va_arg(arg_ptr,int);
++	  if (sizeof(number)==sizeof(long) && sizeof(long)>sizeof(int) && !flag_in_sign)
++		number=(unsigned long)(unsigned int)number;
++	}
+ 
+ 	if (flag_in_sign) {
+ #ifdef WANT_LONGLONG_PRINTF

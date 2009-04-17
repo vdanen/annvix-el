@@ -1,0 +1,17 @@
+--- dietlibc-0.27/test/Makefile.bak	2004-11-21 15:00:00.143971421 +0100
++++ dietlibc-0.27/test/Makefile	2004-11-25 20:35:49.670552312 +0100
+@@ -1,4 +1,4 @@
+-all: direnttest inet stdiotests stdlibtests stringtests timetests \
++all: direnttest inettests stdiotests stdlibtests stringtests timetests \
+ test ffs getdelim stdlib 
+ 
+ DIET="/home/spturtle/rpm/BUILD/dietlibc-0.27/bin-ppc/diet"
+@@ -35,7 +35,7 @@
+ direnttest:
+ 	 $(MAKE) -C dirent CC="$(CC)" CFLAGS="$(CFLAGS)" DIET=$(DIET) LCOMPAT=$(LCOMPAT)
+ 
+-inettest:
++inettests:
+ 	$(MAKE) -C inet CC="$(CC)" CFLAGS="$(CFLAGS)" DIET=$(DIET) LCOMPAT=$(LCOMPAT)
+ 
+ stdiotests:

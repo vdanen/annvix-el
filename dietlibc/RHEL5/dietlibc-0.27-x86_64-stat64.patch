@@ -1,0 +1,36 @@
+--- dietlibc-0.27/include/sys/stat.h.stat64	2004-03-26 10:25:15.000000000 -0500
++++ dietlibc-0.27/include/sys/stat.h	2004-12-08 15:41:21.210758429 -0500
+@@ -529,6 +529,27 @@
+ 	long		__unused[3];
+ };
+ 
++struct stat64 {
++	unsigned long	st_dev;
++	unsigned long	st_ino;
++	unsigned long	st_nlink;
++	unsigned int	st_mode;
++	unsigned int	st_uid;
++	unsigned int	st_gid;
++	unsigned int	__pad0;
++	unsigned long	 st_rdev;
++	unsigned long	st_size;
++	unsigned long	st_blksize;
++	unsigned long	st_blocks;
++	unsigned long	st_atime;
++	unsigned long	__reserved0;
++	unsigned long	st_mtime;
++	unsigned long	__reserved1;
++	unsigned long	st_ctime;
++	unsigned long	__reserved2;
++	long		__unused[3];
++};
++
+ #elif defined(__ia64__)
+ 
+ struct stat {
+--- dietlibc-0.27/x86_64/fstat64.S.stat64	2004-12-08 15:44:26.905907603 -0500
++++ dietlibc-0.27/x86_64/fstat64.S	2004-12-08 15:45:42.515346313 -0500
+@@ -0,0 +1,3 @@
++#include "syscalls.h"
++
++syscall(fstat,fstat64)
