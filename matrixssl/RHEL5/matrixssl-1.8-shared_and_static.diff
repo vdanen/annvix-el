@@ -1,0 +1,42 @@
+--- src/Makefile	2006-04-07 16:20:46.000000000 +0200
++++ src/Makefile.oden	2006-04-07 16:20:41.000000000 +0200
+@@ -68,7 +68,7 @@
+ #
+ #	Compile options
+ #
+-SHARED	= -shared 
++SHARED	= -shared -Wl,-soname,$(LIBRARY).1
+ CFLAGS  = $(DFLAGS) -DLINUX -I./
+ LDFLAGS += -lc -lpthread
+ 
+@@ -92,9 +92,14 @@
+ STRIP	= /opt/brcm/hndtools-mipsel-uclibc/bin/mipsel-uclibc-strip
+ endif
+ 
+-all: compile
++all: static shared
+ 
+-compile: $(OBJECTS) $(LIBRARY) $(STATIC)
++static: $(OBJECTS)
++	rm -f libmatrixssl.a
++	ar cr libmatrixssl.a $(OBJECTS)
++	ranlib libmatrixssl.a
++
++shared: $(OBJECTS) $(LIBRARY)
+ 
+ #
+ # Manual dependencies
+@@ -112,7 +117,6 @@
+ #
+ $(LIBRARY): $(OBJECTS)
+ 	$(CC) $(SHARED) -o $@ $^ $(LDFLAGS)
+-	$(STRIP) $(LIBRARY)
+ 
+ #
+ # Build the static library
+@@ -126,4 +130,4 @@
+ #	Clean up all generated files
+ #
+ clean:
+-	rm -f $(LIBRARY) $(OBJECTS) $(STATIC)
++	rm -f $(LIBRARY) $(OBJECTS) libmatrixssl.a

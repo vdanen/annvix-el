@@ -1,0 +1,33 @@
+diff -Naur matrixssl-1-8-1/src/matrixConfig.h matrixssl-1-8-1.oden/src/matrixConfig.h
+--- matrixssl-1-8-1/src/matrixConfig.h	2006-06-28 19:41:04.000000000 +0200
++++ matrixssl-1-8-1.oden/src/matrixConfig.h	2006-07-13 09:32:13.000000000 +0200
+@@ -89,7 +89,7 @@
+ 	different threads.  The library will still be single threaded,
+ 	but will serialize access to the session cache with a mutex.
+ */
+-#define USE_MULTITHREADING
++/* #define USE_MULTITHREADING */
+ 
+ /******************************************************************************/
+ /*
+diff -Naur matrixssl-1-8-1/src/os/linux/linux.c matrixssl-1-8-1.oden/src/os/linux/linux.c
+--- matrixssl-1-8-1/src/os/linux/linux.c	2006-06-28 19:38:08.000000000 +0200
++++ matrixssl-1-8-1.oden/src/os/linux/linux.c	2006-07-13 09:34:00.000000000 +0200
+@@ -40,7 +40,7 @@
+ #include "../osLayer.h"
+ 
+ #if defined(USE_RDTSCLL_TIME) || defined(RDTSC)
+-#include <asm/timex.h>
++/* #include <asm/timex.h> */
+ /*
+ 	As defined in asm/timex.h for x386:
+ */
+@@ -317,7 +317,7 @@
+ 	} else {
+ 		deltaticks = (0xFFFFFFFF - prevTicks) + 1 + t;
+ 	}
+-	deltat = ((deltaticks * 1000) + (CLK_TCK / 2)) / CLK_TCK;
++	deltat = ((deltaticks * 1000) + (CLOCKS_PER_SEC / 2)) / CLOCKS_PER_SEC;
+                                                                      
+ /*
+  *	Add the delta to the previous elapsed time.
