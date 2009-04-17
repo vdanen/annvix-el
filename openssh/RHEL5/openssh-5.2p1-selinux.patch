@@ -1,6 +1,6 @@
-diff -up openssh-5.1p1/configure.ac.selinux openssh-5.1p1/configure.ac
---- openssh-5.1p1/configure.ac.selinux	2008-07-23 16:32:13.000000000 +0200
-+++ openssh-5.1p1/configure.ac	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/configure.ac.selinux openssh-5.2p1/configure.ac
+--- openssh-5.2p1/configure.ac.selinux	2008-07-23 16:32:13.000000000 +0200
++++ openssh-5.2p1/configure.ac	2008-07-23 16:32:13.000000000 +0200
 @@ -3309,6 +3309,7 @@ AC_ARG_WITH(selinux,
  		AC_CHECK_LIB(selinux, setexeccon, [ LIBSELINUX="-lselinux" ],
  		    AC_MSG_ERROR(SELinux support requires libselinux library))
@@ -9,9 +9,9 @@ diff -up openssh-5.1p1/configure.ac.selinux openssh-5.1p1/configure.ac
  		AC_CHECK_FUNCS(getseuserbyname get_default_context_with_level)
  		LIBS="$save_LIBS"
  	fi ]
-diff -up openssh-5.1p1/auth1.c.selinux openssh-5.1p1/auth1.c
---- openssh-5.1p1/auth1.c.selinux	2008-07-23 16:32:13.000000000 +0200
-+++ openssh-5.1p1/auth1.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/auth1.c.selinux openssh-5.2p1/auth1.c
+--- openssh-5.2p1/auth1.c.selinux	2008-07-23 16:32:13.000000000 +0200
++++ openssh-5.2p1/auth1.c	2008-07-23 16:32:13.000000000 +0200
 @@ -391,7 +391,7 @@ void
  do_authentication(Authctxt *authctxt)
  {
@@ -41,9 +41,9 @@ diff -up openssh-5.1p1/auth1.c.selinux openssh-5.1p1/auth1.c
  
  	/* Verify that the user is a valid user. */
  	if ((authctxt->pw = PRIVSEP(getpwnamallow(user))) != NULL)
-diff -up openssh-5.1p1/auth2-pubkey.c.selinux openssh-5.1p1/auth2-pubkey.c
---- openssh-5.1p1/auth2-pubkey.c.selinux	2008-07-04 04:54:25.000000000 +0200
-+++ openssh-5.1p1/auth2-pubkey.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/auth2-pubkey.c.selinux openssh-5.2p1/auth2-pubkey.c
+--- openssh-5.2p1/auth2-pubkey.c.selinux	2008-07-04 04:54:25.000000000 +0200
++++ openssh-5.2p1/auth2-pubkey.c	2008-07-23 16:32:13.000000000 +0200
 @@ -117,7 +117,14 @@ userauth_pubkey(Authctxt *authctxt)
  		}
  		/* reconstruct packet */
@@ -60,9 +60,9 @@ diff -up openssh-5.1p1/auth2-pubkey.c.selinux openssh-5.1p1/auth2-pubkey.c
  		buffer_put_cstring(&b,
  		    datafellows & SSH_BUG_PKSERVICE ?
  		    "ssh-userauth" :
-diff -up openssh-5.1p1/monitor_wrap.h.selinux openssh-5.1p1/monitor_wrap.h
---- openssh-5.1p1/monitor_wrap.h.selinux	2006-08-05 04:39:40.000000000 +0200
-+++ openssh-5.1p1/monitor_wrap.h	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/monitor_wrap.h.selinux openssh-5.2p1/monitor_wrap.h
+--- openssh-5.2p1/monitor_wrap.h.selinux	2006-08-05 04:39:40.000000000 +0200
++++ openssh-5.2p1/monitor_wrap.h	2008-07-23 16:32:13.000000000 +0200
 @@ -41,6 +41,7 @@ int mm_is_monitor(void);
  DH *mm_choose_dh(int, int, int);
  int mm_key_sign(Key *, u_char **, u_int *, u_char *, u_int);
@@ -71,9 +71,9 @@ diff -up openssh-5.1p1/monitor_wrap.h.selinux openssh-5.1p1/monitor_wrap.h
  struct passwd *mm_getpwnamallow(const char *);
  char *mm_auth2_read_banner(void);
  int mm_auth_password(struct Authctxt *, char *);
-diff -up openssh-5.1p1/monitor.h.selinux openssh-5.1p1/monitor.h
---- openssh-5.1p1/monitor.h.selinux	2006-03-26 05:30:02.000000000 +0200
-+++ openssh-5.1p1/monitor.h	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/monitor.h.selinux openssh-5.2p1/monitor.h
+--- openssh-5.2p1/monitor.h.selinux	2006-03-26 05:30:02.000000000 +0200
++++ openssh-5.2p1/monitor.h	2008-07-23 16:32:13.000000000 +0200
 @@ -30,7 +30,7 @@
  
  enum monitor_reqtype {
@@ -83,9 +83,9 @@ diff -up openssh-5.1p1/monitor.h.selinux openssh-5.1p1/monitor.h
  	MONITOR_REQ_SIGN, MONITOR_ANS_SIGN,
  	MONITOR_REQ_PWNAM, MONITOR_ANS_PWNAM,
  	MONITOR_REQ_AUTH2_READ_BANNER, MONITOR_ANS_AUTH2_READ_BANNER,
-diff -up openssh-5.1p1/auth2-hostbased.c.selinux openssh-5.1p1/auth2-hostbased.c
---- openssh-5.1p1/auth2-hostbased.c.selinux	2008-07-17 10:57:19.000000000 +0200
-+++ openssh-5.1p1/auth2-hostbased.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/auth2-hostbased.c.selinux openssh-5.2p1/auth2-hostbased.c
+--- openssh-5.2p1/auth2-hostbased.c.selinux	2008-07-17 10:57:19.000000000 +0200
++++ openssh-5.2p1/auth2-hostbased.c	2008-07-23 16:32:13.000000000 +0200
 @@ -106,7 +106,14 @@ userauth_hostbased(Authctxt *authctxt)
  	buffer_put_string(&b, session_id2, session_id2_len);
  	/* reconstruct packet */
@@ -102,9 +102,9 @@ diff -up openssh-5.1p1/auth2-hostbased.c.selinux openssh-5.1p1/auth2-hostbased.c
  	buffer_put_cstring(&b, service);
  	buffer_put_cstring(&b, "hostbased");
  	buffer_put_string(&b, pkalg, alen);
-diff -up openssh-5.1p1/monitor_wrap.c.selinux openssh-5.1p1/monitor_wrap.c
---- openssh-5.1p1/monitor_wrap.c.selinux	2008-07-11 09:36:48.000000000 +0200
-+++ openssh-5.1p1/monitor_wrap.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/monitor_wrap.c.selinux openssh-5.2p1/monitor_wrap.c
+--- openssh-5.2p1/monitor_wrap.c.selinux	2008-07-11 09:36:48.000000000 +0200
++++ openssh-5.2p1/monitor_wrap.c	2008-07-23 16:32:13.000000000 +0200
 @@ -296,6 +296,23 @@ mm_inform_authserv(char *service, char *
  	buffer_free(&m);
  }
@@ -129,9 +129,9 @@ diff -up openssh-5.1p1/monitor_wrap.c.selinux openssh-5.1p1/monitor_wrap.c
  /* Do the password authentication */
  int
  mm_auth_password(Authctxt *authctxt, char *password)
-diff -up openssh-5.1p1/openbsd-compat/port-linux.c.selinux openssh-5.1p1/openbsd-compat/port-linux.c
---- openssh-5.1p1/openbsd-compat/port-linux.c.selinux	2008-03-26 21:27:21.000000000 +0100
-+++ openssh-5.1p1/openbsd-compat/port-linux.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/openbsd-compat/port-linux.c.selinux openssh-5.2p1/openbsd-compat/port-linux.c
+--- openssh-5.2p1/openbsd-compat/port-linux.c.selinux	2008-03-26 21:27:21.000000000 +0100
++++ openssh-5.2p1/openbsd-compat/port-linux.c	2008-07-23 16:32:13.000000000 +0200
 @@ -30,11 +30,16 @@
  #ifdef WITH_SELINUX
  #include "log.h"
@@ -193,20 +193,20 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.selinux openssh-5.1p1/openbsd
  
  	if (r != 0) {
  		switch (security_getenforce()) {
-diff -up openssh-5.1p1/auth.h.selinux openssh-5.1p1/auth.h
---- openssh-5.1p1/auth.h.selinux	2008-07-02 14:37:30.000000000 +0200
-+++ openssh-5.1p1/auth.h	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/auth.h.selinux openssh-5.2p1/auth.h
+--- openssh-5.2p1/auth.h.selinux	2008-07-02 14:37:30.000000000 +0200
++++ openssh-5.2p1/auth.h	2008-07-23 16:32:13.000000000 +0200
 @@ -58,6 +58,7 @@ struct Authctxt {
  	char		*service;
  	struct passwd	*pw;		/* set if 'valid' */
  	char		*style;
 +	char		*role;
  	void		*kbdintctxt;
+ 	void		*jpake_ctx;
  #ifdef BSD_AUTH
- 	auth_session_t	*as;
-diff -up openssh-5.1p1/auth2.c.selinux openssh-5.1p1/auth2.c
---- openssh-5.1p1/auth2.c.selinux	2008-07-05 01:44:53.000000000 +0200
-+++ openssh-5.1p1/auth2.c	2008-07-23 16:32:13.000000000 +0200
+diff -up openssh-5.2p1/auth2.c.selinux openssh-5.2p1/auth2.c
+--- openssh-5.2p1/auth2.c.selinux	2008-07-05 01:44:53.000000000 +0200
++++ openssh-5.2p1/auth2.c	2008-07-23 16:32:13.000000000 +0200
 @@ -209,7 +209,7 @@ input_userauth_request(int type, u_int32
  {
  	Authctxt *authctxt = ctxt;
@@ -239,9 +239,9 @@ diff -up openssh-5.1p1/auth2.c.selinux openssh-5.1p1/auth2.c
  		userauth_banner();
  	} else if (strcmp(user, authctxt->user) != 0 ||
  	    strcmp(service, authctxt->service) != 0) {
-diff -up openssh-5.1p1/monitor.c.selinux openssh-5.1p1/monitor.c
---- openssh-5.1p1/monitor.c.selinux	2008-07-11 09:36:48.000000000 +0200
-+++ openssh-5.1p1/monitor.c	2008-07-23 16:36:10.000000000 +0200
+diff -up openssh-5.2p1/monitor.c.selinux openssh-5.2p1/monitor.c
+--- openssh-5.2p1/monitor.c.selinux	2008-07-11 09:36:48.000000000 +0200
++++ openssh-5.2p1/monitor.c	2008-07-23 16:36:10.000000000 +0200
 @@ -134,6 +134,7 @@ int mm_answer_sign(int, Buffer *);
  int mm_answer_pwnamallow(int, Buffer *);
  int mm_answer_auth2_read_banner(int, Buffer *);

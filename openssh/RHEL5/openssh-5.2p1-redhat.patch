@@ -1,6 +1,6 @@
-diff -up openssh-5.1p1/sshd_config.redhat openssh-5.1p1/sshd_config
---- openssh-5.1p1/sshd_config.redhat	2008-07-02 14:35:43.000000000 +0200
-+++ openssh-5.1p1/sshd_config	2008-07-23 14:11:12.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.redhat openssh-5.2p1/sshd_config
+--- openssh-5.2p1/sshd_config.redhat	2008-07-02 14:35:43.000000000 +0200
++++ openssh-5.2p1/sshd_config	2008-07-23 14:11:12.000000000 +0200
 @@ -33,6 +33,7 @@ Protocol 2
  # Logging
  # obsoletes QuietMode and FascistLogging
@@ -50,13 +50,13 @@ diff -up openssh-5.1p1/sshd_config.redhat openssh-5.1p1/sshd_config
  #X11DisplayOffset 10
  #X11UseLocalhost yes
  #PrintMotd yes
-diff -up openssh-5.1p1/ssh_config.redhat openssh-5.1p1/ssh_config
---- openssh-5.1p1/ssh_config.redhat	2007-06-11 06:04:42.000000000 +0200
-+++ openssh-5.1p1/ssh_config	2008-07-23 14:07:29.000000000 +0200
-@@ -43,3 +43,13 @@
- #   Tunnel no
+diff -up openssh-5.2p1/ssh_config.redhat openssh-5.2p1/ssh_config
+--- openssh-5.2p1/ssh_config.redhat	2007-06-11 06:04:42.000000000 +0200
++++ openssh-5.2p1/ssh_config	2008-07-23 14:07:29.000000000 +0200
+@@ -44,3 +44,13 @@
  #   TunnelDevice any:any
  #   PermitLocalCommand no
+ #   VisualHostKey no
 +Host *
 +	GSSAPIAuthentication yes
 +# If this option is set to yes then remote X11 clients will have full access
@@ -67,9 +67,9 @@ diff -up openssh-5.1p1/ssh_config.redhat openssh-5.1p1/ssh_config
 +	SendEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES 
 +	SendEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT 
 +	SendEnv LC_IDENTIFICATION LC_ALL LANGUAGE
-diff -up openssh-5.1p1/sshd_config.0.redhat openssh-5.1p1/sshd_config.0
---- openssh-5.1p1/sshd_config.0.redhat	2008-07-21 10:30:51.000000000 +0200
-+++ openssh-5.1p1/sshd_config.0	2008-07-23 14:07:29.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.0.redhat openssh-5.2p1/sshd_config.0
+--- openssh-5.2p1/sshd_config.0.redhat	2008-07-21 10:30:51.000000000 +0200
++++ openssh-5.2p1/sshd_config.0	2008-07-23 14:07:29.000000000 +0200
 @@ -490,9 +490,9 @@ DESCRIPTION
  
       SyslogFacility
@@ -83,9 +83,9 @@ diff -up openssh-5.1p1/sshd_config.0.redhat openssh-5.1p1/sshd_config.0
  
       TCPKeepAlive
               Specifies whether the system should send TCP keepalive messages
-diff -up openssh-5.1p1/sshd_config.5.redhat openssh-5.1p1/sshd_config.5
---- openssh-5.1p1/sshd_config.5.redhat	2008-07-02 14:35:43.000000000 +0200
-+++ openssh-5.1p1/sshd_config.5	2008-07-23 14:07:29.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.5.redhat openssh-5.2p1/sshd_config.5
+--- openssh-5.2p1/sshd_config.5.redhat	2008-07-02 14:35:43.000000000 +0200
++++ openssh-5.2p1/sshd_config.5	2008-07-23 14:07:29.000000000 +0200
 @@ -846,7 +846,7 @@ Note that this option applies to protoco
  .It Cm SyslogFacility
  Gives the facility code that is used when logging messages from

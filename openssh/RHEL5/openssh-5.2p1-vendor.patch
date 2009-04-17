@@ -1,6 +1,6 @@
-diff -up openssh-5.1p1/configure.ac.vendor openssh-5.1p1/configure.ac
---- openssh-5.1p1/configure.ac.vendor	2008-07-23 14:13:22.000000000 +0200
-+++ openssh-5.1p1/configure.ac	2008-07-23 14:13:22.000000000 +0200
+diff -up openssh-5.2p1/configure.ac.vendor openssh-5.2p1/configure.ac
+--- openssh-5.2p1/configure.ac.vendor	2008-07-23 14:13:22.000000000 +0200
++++ openssh-5.2p1/configure.ac	2008-07-23 14:13:22.000000000 +0200
 @@ -3890,6 +3890,12 @@ AC_ARG_WITH(lastlog,
  		fi
  	]
@@ -22,9 +22,9 @@ diff -up openssh-5.1p1/configure.ac.vendor openssh-5.1p1/configure.ac
  if test ! -z "$USE_RAND_HELPER" ; then
  echo "     ssh-rand-helper collects from: $RAND_HELPER_MSG"
  fi
-diff -up openssh-5.1p1/sshd_config.5.vendor openssh-5.1p1/sshd_config.5
---- openssh-5.1p1/sshd_config.5.vendor	2008-07-23 14:13:22.000000000 +0200
-+++ openssh-5.1p1/sshd_config.5	2008-07-23 14:19:23.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.5.vendor openssh-5.2p1/sshd_config.5
+--- openssh-5.2p1/sshd_config.5.vendor	2008-07-23 14:13:22.000000000 +0200
++++ openssh-5.2p1/sshd_config.5	2008-07-23 14:19:23.000000000 +0200
 @@ -812,6 +812,14 @@ This option applies to protocol version 
  .It Cm ServerKeyBits
  Defines the number of bits in the ephemeral protocol version 1 server key.
@@ -40,9 +40,9 @@ diff -up openssh-5.1p1/sshd_config.5.vendor openssh-5.1p1/sshd_config.5
  .It Cm StrictModes
  Specifies whether
  .Xr sshd 8
-diff -up openssh-5.1p1/servconf.h.vendor openssh-5.1p1/servconf.h
---- openssh-5.1p1/servconf.h.vendor	2008-06-10 15:01:51.000000000 +0200
-+++ openssh-5.1p1/servconf.h	2008-07-23 14:13:22.000000000 +0200
+diff -up openssh-5.2p1/servconf.h.vendor openssh-5.2p1/servconf.h
+--- openssh-5.2p1/servconf.h.vendor	2008-06-10 15:01:51.000000000 +0200
++++ openssh-5.2p1/servconf.h	2008-07-23 14:13:22.000000000 +0200
 @@ -126,6 +126,7 @@ typedef struct {
  	int	max_authtries;
  	int	max_sessions;
@@ -51,9 +51,9 @@ diff -up openssh-5.1p1/servconf.h.vendor openssh-5.1p1/servconf.h
  	int	use_dns;
  	int	client_alive_interval;	/*
  					 * poke the client this often to
-diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
---- openssh-5.1p1/servconf.c.vendor	2008-07-04 05:51:12.000000000 +0200
-+++ openssh-5.1p1/servconf.c	2008-07-23 14:32:27.000000000 +0200
+diff -up openssh-5.2p1/servconf.c.vendor openssh-5.2p1/servconf.c
+--- openssh-5.2p1/servconf.c.vendor	2008-07-04 05:51:12.000000000 +0200
++++ openssh-5.2p1/servconf.c	2008-07-23 14:32:27.000000000 +0200
 @@ -117,6 +117,7 @@ initialize_server_options(ServerOptions 
  	options->max_authtries = -1;
  	options->max_sessions = -1;
@@ -62,17 +62,17 @@ diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
  	options->use_dns = -1;
  	options->client_alive_interval = -1;
  	options->client_alive_count_max = -1;
-@@ -259,6 +260,9 @@ fill_default_server_options(ServerOption
- 	if (options->permit_tun == -1)
- 		options->permit_tun = SSH_TUNMODE_NO;
+@@ -262,6 +263,9 @@ fill_default_server_options(ServerOption
+ 	if (options->zero_knowledge_password_authentication == -1)
+ 		options->zero_knowledge_password_authentication = 0;
  
 +	if (options->show_patchlevel == -1)
-+		options->show_patchlevel = 0;
-+
++ 		options->show_patchlevel = 0;
++ 
  	/* Turn privilege separation on by default */
  	if (use_privsep == -1)
  		use_privsep = 1;
-@@ -296,7 +300,7 @@ typedef enum {
+@@ -299,7 +303,7 @@ typedef enum {
  	sIgnoreUserKnownHosts, sCiphers, sMacs, sProtocol, sPidFile,
  	sGatewayPorts, sPubkeyAuthentication, sXAuthLocation, sSubsystem,
  	sMaxStartups, sMaxAuthTries, sMaxSessions,
@@ -81,7 +81,7 @@ diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
  	sHostbasedUsesNameFromPacketOnly, sClientAliveInterval,
  	sClientAliveCountMax, sAuthorizedKeysFile, sAuthorizedKeysFile2,
  	sGssAuthentication, sGssCleanupCreds, sAcceptEnv, sPermitTunnel,
-@@ -401,6 +405,7 @@ static struct {
+@@ -410,6 +414,7 @@ static struct {
  	{ "maxauthtries", sMaxAuthTries, SSHCFG_ALL },
  	{ "maxsessions", sMaxSessions, SSHCFG_ALL },
  	{ "banner", sBanner, SSHCFG_ALL },
@@ -89,7 +89,7 @@ diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
  	{ "usedns", sUseDNS, SSHCFG_GLOBAL },
  	{ "verifyreversemapping", sDeprecated, SSHCFG_GLOBAL },
  	{ "reversemappingcheck", sDeprecated, SSHCFG_GLOBAL },
-@@ -1020,6 +1025,10 @@ process_server_config_line(ServerOptions
+@@ -1033,6 +1038,10 @@ process_server_config_line(ServerOptions
  		intptr = &use_privsep;
  		goto parse_flag;
  
@@ -100,7 +100,7 @@ diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
  	case sAllowUsers:
  		while ((arg = strdelim(&cp)) && *arg != '\0') {
  			if (options->num_allow_users >= MAX_ALLOW_USERS)
-@@ -1584,6 +1593,7 @@ dump_config(ServerOptions *o)
+@@ -1613,6 +1622,7 @@ dump_config(ServerOptions *o)
  	dump_cfg_fmtint(sUseLogin, o->use_login);
  	dump_cfg_fmtint(sCompression, o->compression);
  	dump_cfg_fmtint(sGatewayPorts, o->gateway_ports);
@@ -108,9 +108,9 @@ diff -up openssh-5.1p1/servconf.c.vendor openssh-5.1p1/servconf.c
  	dump_cfg_fmtint(sUseDNS, o->use_dns);
  	dump_cfg_fmtint(sAllowTcpForwarding, o->allow_tcp_forwarding);
  	dump_cfg_fmtint(sUsePrivilegeSeparation, use_privsep);
-diff -up openssh-5.1p1/sshd_config.0.vendor openssh-5.1p1/sshd_config.0
---- openssh-5.1p1/sshd_config.0.vendor	2008-07-23 14:13:22.000000000 +0200
-+++ openssh-5.1p1/sshd_config.0	2008-07-23 14:13:22.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.0.vendor openssh-5.2p1/sshd_config.0
+--- openssh-5.2p1/sshd_config.0.vendor	2008-07-23 14:13:22.000000000 +0200
++++ openssh-5.2p1/sshd_config.0	2008-07-23 14:13:22.000000000 +0200
 @@ -466,6 +466,11 @@ DESCRIPTION
               Defines the number of bits in the ephemeral protocol version 1
               server key.  The minimum value is 512, and the default is 1024.
@@ -123,9 +123,9 @@ diff -up openssh-5.1p1/sshd_config.0.vendor openssh-5.1p1/sshd_config.0
       StrictModes
               Specifies whether sshd(8) should check file modes and ownership
               of the user's files and home directory before accepting login.
-diff -up openssh-5.1p1/sshd_config.vendor openssh-5.1p1/sshd_config
---- openssh-5.1p1/sshd_config.vendor	2008-07-23 14:13:22.000000000 +0200
-+++ openssh-5.1p1/sshd_config	2008-07-23 14:13:22.000000000 +0200
+diff -up openssh-5.2p1/sshd_config.vendor openssh-5.2p1/sshd_config
+--- openssh-5.2p1/sshd_config.vendor	2008-07-23 14:13:22.000000000 +0200
++++ openssh-5.2p1/sshd_config	2008-07-23 14:13:22.000000000 +0200
 @@ -112,6 +112,7 @@ X11Forwarding yes
  #Compression delayed
  #ClientAliveInterval 0
@@ -134,9 +134,9 @@ diff -up openssh-5.1p1/sshd_config.vendor openssh-5.1p1/sshd_config
  #UseDNS yes
  #PidFile /var/run/sshd.pid
  #MaxStartups 10
-diff -up openssh-5.1p1/sshd.c.vendor openssh-5.1p1/sshd.c
---- openssh-5.1p1/sshd.c.vendor	2008-07-11 09:36:49.000000000 +0200
-+++ openssh-5.1p1/sshd.c	2008-07-23 14:35:43.000000000 +0200
+diff -up openssh-5.2p1/sshd.c.vendor openssh-5.2p1/sshd.c
+--- openssh-5.2p1/sshd.c.vendor	2008-07-11 09:36:49.000000000 +0200
++++ openssh-5.2p1/sshd.c	2008-07-23 14:35:43.000000000 +0200
 @@ -416,7 +416,7 @@ sshd_exchange_identification(int sock_in
  		minor = PROTOCOL_MINOR_1;
  	}
