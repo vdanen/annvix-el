@@ -63,14 +63,6 @@ Provides:	%{name}
 Small libc for building embedded applications.
 
 
-%package doc
-Summary:	Documentation for %{name}
-Group:		Documentation
-
-%description doc
-This package contains the documentation for %{name}.
-
-
 %prep
 %setup -q 
 %patch0 -p1 -b .features
@@ -135,14 +127,11 @@ make DESTDIR=%{buildroot} install
 
 %files devel
 %defattr(-,root,root)
+%doc AUTHOR BUGS CAVEAT CHANGES README THANKS TODO FAQ
 %{_bindir}/diet
 %dir %{diethome}
 %{diethome}/*
 %{_mandir}/man*/*
-
-%files doc
-%defattr(-,root,root)
-%doc AUTHOR BUGS CAVEAT CHANGES README THANKS TODO FAQ
 
 
 %changelog
