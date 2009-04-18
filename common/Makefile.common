@@ -19,11 +19,6 @@ RPMDIR ?= $(WORKDIR)
 RPM := rpmbuild
 ARCH = $(shell uname -m)
 
-RPM_DEFINES = $(RPM) --define "_sourcedir $(SOURCEDIR)" \
-	--define "_builddir $(BUILDDIR)" \
-	--define "_srcrpmdir $(SRCRPMDIR)" \
-	--define "_rpmdir $(RPMDIR)"
-
 VER_REL := $(shell rpm -q --qf "%{VERSION} %{RELEASE}\n" --specfile $(SPECFILE) | head -1)
 
 ifndef RPM_SIGN_SCRIPT
@@ -54,29 +49,37 @@ ifndef BUILDARCH
 BUILDARCH := $(if $(shell grep -i '^BuildArch:.*noarch' $(SPECFILE)),noarch,$(LOCALARCH))
 endif
 
-RPM_BUILD_DIR ?= $(BUILDDIR)/$(NAME)-$(VERSION)
+RPM_BUILD_DIR ?= $(BUILDDIR)/build-$(NAME)-$(VERSION)
+
+RPM_DEFINES = $(RPM) --define "_sourcedir $(SOURCEDIR)" \
+	--define "_builddir $(RPM_BUILD_DIR)" \
+	--define "_srcrpmdir $(SRCRPMDIR)" \
+	--define "_rpmdir $(RPMDIR)"
 
 all: build sign lint
 
-build:
+bprep:
+	mkdir -p $(RPM_BUILD_DIR)
+
+build: bprep
 	$(RPM_DEFINES) -ba $(SPECFILE) 2>&1 | tee build.log
 
 srpm:
 	$(RPM_DEFINES) --nodeps -bs $(SPECFILE)
 
-prep:
+prep: brep
 	$(RPM_DEFINES) -bp $(SPECFILE)
 
-compile:
+compile: brep
 	$(RPM_DEFINES) -bc $(SPECFILE)
 
-install:
+install: brep
 	$(RPM_DEFINES) -bi $(SPECFILE)
 
-compile-short:
+compile-short: brep
 	$(RPM_DEFINES) -bc --short-circuit $(SPECFILE)
 
-install-short:
+install-short: brep
 	$(RPM_DEFINES) -bi --short-circuit $(SPECFILE)
 
 verrel:
@@ -92,7 +95,7 @@ sign:
 	@echo $(shell for name in $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm; do $(RPM_SIGN_SCRIPT) $$name; done)
 
 clean:
-	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH) build.log $(NAME)-$(VERSION)
+	@rm -rf $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH) build.log $(RPM_BUILD_DIR)
 
 move:
 	$(MOVE_SCRIPT) $(DIST) $(LOCALARCH) $(NAME)-$(VERSION)-$(RELEASE).src.rpm $(BUILDARCH)/*-$(VERSION)-$(RELEASE).$(BUILDARCH).rpm
