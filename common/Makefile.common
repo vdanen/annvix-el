@@ -67,19 +67,19 @@ build: bprep
 srpm:
 	$(RPM_DEFINES) --nodeps -bs $(SPECFILE)
 
-prep: brep
+prep: bprep
 	$(RPM_DEFINES) -bp $(SPECFILE)
 
-compile: brep
+compile: bprep
 	$(RPM_DEFINES) -bc $(SPECFILE)
 
-install: brep
+install: bprep
 	$(RPM_DEFINES) -bi $(SPECFILE)
 
-compile-short: brep
+compile-short: bprep
 	$(RPM_DEFINES) -bc --short-circuit $(SPECFILE)
 
-install-short: brep
+install-short: bprep
 	$(RPM_DEFINES) -bi --short-circuit $(SPECFILE)
 
 verrel:
