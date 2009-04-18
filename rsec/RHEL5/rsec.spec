@@ -9,7 +9,7 @@
 
 %define name		rsec
 %define version		0.70.2
-%define release		1%{?dist}%{?rescue_rel}
+%define release		2%{?dist}%{?rescue_rel}
 
 Summary:	Security Reporting tool for Annvix
 Name:		%{name}
@@ -30,7 +30,7 @@ Requires:	shadow-utils
 Requires:	gawk
 Requires:	mailx
 Requires:	setup >= 2.2.0-21mdk
-Requires:	iproute2
+Requires:	iproute
 Requires:	rkhunter >= 1.3.0
 Conflicts:	passwd < 0.67
 Conflicts:	msec
@@ -101,6 +101,9 @@ touch /var/log/security.log && chmod 0640 /var/log/security.log
 
 
 %changelog
+* Sat Apr 18 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.2
+- change dependency on iproute2 to iproute
+
 * Fri Apr 17 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.2
 - 0.70.2
 - first build for CentOS/RHEL 5
