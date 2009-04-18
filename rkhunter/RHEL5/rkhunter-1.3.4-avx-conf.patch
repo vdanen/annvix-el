@@ -1,0 +1,42 @@
+--- files/rkhunter.conf.avx-conf	2007-09-01 07:05:26.000000000 -0600
++++ files/rkhunter.conf	2007-12-03 19:40:51.980938250 -0700
+@@ -75,7 +75,7 @@
+ # important files will be written to this directory, so be
+ # sure that the directory permissions are tight.
+ #
+-#TMPDIR=/var/lib/rkhunter/tmp
++TMPDIR=/var/lib/rkhunter/tmp
+ 
+ #
+ # Specify the database directory to use.
+@@ -107,7 +107,7 @@
+ #
+ # Specify the log file pathname.
+ #
+-LOGFILE=/var/log/rkhunter.log
++LOGFILE=/var/log/security/rkhunter.log
+ 
+ #
+ # Set the following option to 1 if the log file is to be appended to
+--- files/rkhunter.avx-conf	2007-12-03 19:39:39.208390250 -0700
++++ files/rkhunter	2007-12-03 19:39:39.212390500 -0700
+@@ -10850,7 +10850,7 @@
+ 
+ NOLOG=0
+ RKHLOGFILE=""
+-DFLT_LOGFILE="/var/log/rkhunter.log"
++DFLT_LOGFILE="/var/log/security/rkhunter.log"
+ 
+ # Set to have the logfile appended to rather than overwritten.
+ APPEND_LOG=0
+--- files/os.dat.avx-conf	2009-04-18 19:30:53.000000000 +0400
++++ files/os.dat	2009-04-18 19:32:04.000000000 +0400
+@@ -216,6 +216,8 @@ OS id:OS Description:Location of md5:Loc
+ 747:Red Hat Enterprise Linux ES release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
+ 747:Red Hat Enterprise Linux WS release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
+ 747:Red Hat Enterprise Linux AS release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
++748:CentOS release 5.2 (Final):/usr/bin/md5sum:/bin:
++749:CentOS release 5.3 (Final):/usr/bin/md5sum:/bin:
+ 800:Ipcop 1.4.11:/usr/bin/md5sum:/bin:
+ 801:CentOS release 3.8 (Final):/usr/bin/md5sum:/bin:
+ 802:Slackware 11.0.0:/bin/md5sum:/bin:
