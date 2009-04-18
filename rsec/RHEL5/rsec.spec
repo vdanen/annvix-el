@@ -24,7 +24,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 Requires:	bash
 Requires:	coreutils
-Requires:	perl-base
+Requires:	perl
 Requires:	diffutils
 Requires:	shadow-utils
 Requires:	gawk
@@ -103,6 +103,7 @@ touch /var/log/security.log && chmod 0640 /var/log/security.log
 %changelog
 * Sat Apr 18 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.2
 - change dependency on iproute2 to iproute
+- change dependency on perl-base to perl
 
 * Fri Apr 17 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.2
 - 0.70.2
