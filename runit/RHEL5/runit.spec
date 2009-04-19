@@ -8,7 +8,7 @@
 # $Id$
 
 %define	name		runit
-%define	version		1.8.0
+%define	version		2.0.0
 %define	release		1%{?dist}%{?rescue_rel}
 
 %define aver		0.20
@@ -227,6 +227,9 @@ fi
 
 
 %changelog
+* Sun Apr 19 2009 Vincent Danen <vdanen-at-build.annvix.org> 2.0.0
+- 2.0.0
+
 * Sun Apr 19 2009 Vincent Danen <vdanen-at-build.annvix.org> 1.8.0
 - overhaul to install initscripts in /etc/runit.d/ and the annvix-runit
   install comes from itself, not the spec
