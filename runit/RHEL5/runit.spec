@@ -60,11 +60,7 @@ popd
 
 
 %build
-%ifarch x86_64
-COMP="diet x86_64-annvix-linux-gnu-gcc"
-%else
 COMP="diet gcc"
-%endif
 pushd %{name}-%{version}/src
     echo "$COMP -Os -pipe" > conf-cc
     echo "$COMP -Os -static -s" > conf-ld
