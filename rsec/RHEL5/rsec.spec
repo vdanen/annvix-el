@@ -8,8 +8,8 @@
 # $Id$
 
 %define name		rsec
-%define version		0.70.2
-%define release		2%{?dist}%{?rescue_rel}
+%define version		0.70.3
+%define release		1%{?dist}%{?rescue_rel}
 
 Summary:	Security Reporting tool for Annvix
 Name:		%{name}
@@ -101,6 +101,9 @@ touch /var/log/security.log && chmod 0640 /var/log/security.log
 
 
 %changelog
+* Sun Apr 19 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.3
+- 0.70.3
+
 * Sat Apr 18 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.70.2
 - change dependency on iproute2 to iproute
 - change dependency on perl-base to perl
