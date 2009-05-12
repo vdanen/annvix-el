@@ -27,5 +27,5 @@ if [ ! -d ${repo_home} ]; then
 fi
 
 pushd ${repo_home}/${arch} >/dev/null 2>&1
-    createrepo .
+    createrepo -d .
 popd >/dev/null 2>&1
