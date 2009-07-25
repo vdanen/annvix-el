@@ -495,4 +495,4 @@ fi
 * Thu Apr 16 2009 Vincent Danen <vdanen-at-build.annvix.org> 5.1p1-1.el5.avx
 - first Annvix build for CentOS 5.2 (based on Fedora)
 
- vim: expandtab:shiftwidth=8:tabstop=8:softtabstop=8
+# vim: expandtab:shiftwidth=8:tabstop=8:softtabstop=8
