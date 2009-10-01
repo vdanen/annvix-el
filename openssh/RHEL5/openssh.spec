@@ -72,7 +72,7 @@
 
 Summary: The OpenSSH implementation of SSH protocol versions 1 and 2
 Name: openssh
-Version: 5.2p1
+Version: 5.3p1
 Release: 1%{?dist}%{?rescue_rel}
 URL: http://www.openssh.com/portable.html
 #Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
@@ -85,12 +85,11 @@ Source1: openssh-nukeacss.sh
 Source2: sshd.pam
 Source3: sshd.init
 Patch0: openssh-5.2p1-redhat.patch
-Patch2: openssh-5.1p1-skip-initial.patch
-Patch3: openssh-3.8.1p1-krb5-config.patch
+Patch2: openssh-5.3p1-skip-initial.patch
 Patch4: openssh-5.2p1-vendor.patch
 Patch12: openssh-5.2p1-selinux.patch
 Patch13: openssh-5.1p1-mls.patch
-Patch16: openssh-4.7p1-audit.patch
+Patch16: openssh-5.3p1-audit.patch
 Patch17: openssh-4.3p2-cve-2007-3102.patch
 Patch18: openssh-5.0p1-pam_selinux.patch
 Patch22: openssh-3.9p1-askpass-keep-above.patch
@@ -212,7 +211,6 @@ an X11 passphrase dialog for OpenSSH.
 %setup -q
 %patch0 -p1 -b .redhat
 %patch2 -p1 -b .skip-initial
-%patch3 -p1 -b .krb5-config
 %patch4 -p1 -b .vendor
 
 %if %{WITH_SELINUX}
@@ -488,6 +486,11 @@ fi
 %endif
 
 %changelog
+* Thu Oct 1 2009 Vincent Danen <vdanen-at-build.annvix.org> 5.3p1-1.el5.avx
+- 5.3p1
+- rediff P2, P16
+- drop P3, merged upstream
+
 * Thu Apr 16 2009 Vincent Danen <vdanen-at-build.annvix.org> 5.2p1-1.el5.avx
 - 5.2p1
 - merged patches from Fedora 5.2p1-2.fc11
