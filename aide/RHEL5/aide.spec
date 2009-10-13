@@ -7,7 +7,7 @@
 Summary: Intrusion detection environment
 Name: aide
 Version: 0.13.1
-Release: 12%{?dist}
+Release: 12.1%{?dist}
 URL: http://sourceforge.net/projects/aide
 License: GPLv2+
 Group: Applications/System
@@ -86,6 +86,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Oct 13 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.13.1-12.1.el5.avx
+- rebuild with proper mhash-devel/libmhash from rpmforge
+
 * Tue Oct 13 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.13.1-12.el5.avx
 - build Fedora source for EL5, should help with prelink issues
 - remove .dedosify suffixed files
