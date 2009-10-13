@@ -1,0 +1,174 @@
+--- aide-0.12/contrib/gpg2_check.sh.spc	2007-06-21 12:37:06.000000000 -0400
++++ aide-0.12/contrib/gpg2_check.sh	2007-06-21 12:39:53.000000000 -0400
+@@ -1,32 +1,32 @@
+-#!/bin/sh
+-# $Id: gpg2_check.sh,v 1.1 2006/01/22 20:25:37 rvdb Exp $
+-
+-# Script by Vincent Danen <vdanen@linsec.ca>
+-
+-hostname=`uname -n`
+-echo "AIDE integrity check for ${hostname} beginning (`date`)"
+-echo ""
+-if [ ! -e /var/lib/aide/aide.db ] ; then
+-    echo "**** Error: AIDE database for ${hostname} not found."
+-    echo "**** Run 'aide --init' and move the appropriate database file."
+-else
+-    if [ -f /etc/aide.conf ]; then
+-        if [ -f /var/lib/aide/aide.db.sig ]; then
+-	    pushd /var/lib/aide >/dev/null
+-	        echo "Verifying the GPG signature on the database..."
+-		echo ""
+-	        gpg --verify aide.db.sig
+-		echo ""
+-		if [ "$?" == "1" ]; then
+-		    echo "************************************************************"
+-		    echo "GPG signature FAILED!  Your database has been tampered with!"
+-		    echo "************************************************************"
+-		    exit 1
+-		fi
+-	    popd >/dev/null
+-	fi
+-        nice -20 /usr/sbin/aide --check 2>/dev/null
+-    fi
+-fi
+-
+-exit 0
++#!/bin/sh
++# $Id: gpg2_check.sh,v 1.1 2006/01/22 20:25:37 rvdb Exp $
++
++# Script by Vincent Danen <vdanen@linsec.ca>
++
++hostname=`uname -n`
++echo "AIDE integrity check for ${hostname} beginning (`date`)"
++echo ""
++if [ ! -e /var/lib/aide/aide.db ] ; then
++    echo "**** Error: AIDE database for ${hostname} not found."
++    echo "**** Run 'aide --init' and move the appropriate database file."
++else
++    if [ -f /etc/aide.conf ]; then
++        if [ -f /var/lib/aide/aide.db.sig ]; then
++	    pushd /var/lib/aide >/dev/null
++	        echo "Verifying the GPG signature on the database..."
++		echo ""
++	        gpg --verify aide.db.sig
++		echo ""
++		if [ "$?" == "1" ]; then
++		    echo "************************************************************"
++		    echo "GPG signature FAILED!  Your database has been tampered with!"
++		    echo "************************************************************"
++		    exit 1
++		fi
++	    popd >/dev/null
++	fi
++        nice -20 /usr/sbin/aide --check 2>/dev/null
++    fi
++fi
++
++exit 0
+--- aide-0.12/contrib/gpg2_update.sh.spc	2007-06-21 12:37:24.000000000 -0400
++++ aide-0.12/contrib/gpg2_update.sh	2007-06-21 12:39:43.000000000 -0400
+@@ -1,52 +1,52 @@
+-#!/bin/sh
+-# $Id: gpg2_update.sh,v 1.1 2006/01/22 20:25:37 rvdb Exp $
+-#
+-# script to update and rotate the AIDE database files and, optionally
+-# create a detached GPG signature to verify the database file
+-#
+-# written by Vincent Danen <vdanen-at-annvix.org> 01/21/2006
+-
+-usegpg=0
+-
+-if [ -f /root/.gnupg/secring.gpg ]; then
+-    usegpg=1
+-fi
+-
+-if [ ! -d /var/lib/aide ]; then
+-    echo "The AIDE database directory /var/lib/aide does not exist!"
+-    exit 1
+-fi
+-
+-pushd /var/lib/aide >/dev/null
+-
+-# copy the old database
+-if [ -f aide.db ]; then
+-    newfile="aide-`hostname`-`date +%Y%m%d-%H%M%S`.db"
+-    if [ "${usegpg}" == 1 -a -f aide.db.sig ]; then
+-        # do an integrity check
+-	gpg --verify aide.db.sig
+-	if [ "$?" == "1" ]; then
+-	    echo "************************************************************"
+-	    echo "GPG signature FAILED!  Your database has been tampered with!"
+-	    echo "************************************************************"
+-	    exit 1
+-	fi
+-    fi
+-    cp -av aide.db ${newfile} 
+-    /usr/sbin/aide --update -B "database=file:/var/lib/aide/${newfile}" 
+-    if [ "${usegpg}" == "1" ]; then
+-	# create the signature file
+-	[[ -f aide.db.sig ]] && rm -f aide.db.sig
+-        gpg --detach-sign aide.db
+-	if [ "$?" == "1" ]; then
+-	    echo "FATAL:  Error occurred when creating the signature file!"
+-	    exit 1
+-	fi
+-    fi
+-    gzip -9f ${newfile}
+-else
+-    echo "The AIDE database does not exist, can't update!"
+-    exit 1
+-fi
+-
+-popd >/dev/null
++#!/bin/sh
++# $Id: gpg2_update.sh,v 1.1 2006/01/22 20:25:37 rvdb Exp $
++#
++# script to update and rotate the AIDE database files and, optionally
++# create a detached GPG signature to verify the database file
++#
++# written by Vincent Danen <vdanen-at-annvix.org> 01/21/2006
++
++usegpg=0
++
++if [ -f /root/.gnupg/secring.gpg ]; then
++    usegpg=1
++fi
++
++if [ ! -d /var/lib/aide ]; then
++    echo "The AIDE database directory /var/lib/aide does not exist!"
++    exit 1
++fi
++
++pushd /var/lib/aide >/dev/null
++
++# copy the old database
++if [ -f aide.db ]; then
++    newfile="aide-`hostname`-`date +%Y%m%d-%H%M%S`.db"
++    if [ "${usegpg}" == 1 -a -f aide.db.sig ]; then
++        # do an integrity check
++	gpg --verify aide.db.sig
++	if [ "$?" == "1" ]; then
++	    echo "************************************************************"
++	    echo "GPG signature FAILED!  Your database has been tampered with!"
++	    echo "************************************************************"
++	    exit 1
++	fi
++    fi
++    cp -av aide.db ${newfile} 
++    /usr/sbin/aide --update -B "database=file:/var/lib/aide/${newfile}" 
++    if [ "${usegpg}" == "1" ]; then
++	# create the signature file
++	[[ -f aide.db.sig ]] && rm -f aide.db.sig
++        gpg --detach-sign aide.db
++	if [ "$?" == "1" ]; then
++	    echo "FATAL:  Error occurred when creating the signature file!"
++	    exit 1
++	fi
++    fi
++    gzip -9f ${newfile}
++else
++    echo "The AIDE database does not exist, can't update!"
++    exit 1
++fi
++
++popd >/dev/null

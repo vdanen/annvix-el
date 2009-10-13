@@ -1,0 +1,18 @@
+diff -Nur aide-0.13.1-orig/doc/aide.1.in aide-0.13.1/doc/aide.1.in
+--- aide-0.13.1-orig/doc/aide.1.in	2006-11-30 20:38:16.000000000 +0100
++++ aide-0.13.1/doc/aide.1.in	2007-01-05 23:28:44.000000000 +0100
+@@ -73,11 +73,11 @@
+ SIGTERM. Use SIGKILL to terminate.
+ .PP
+ .SH FILES
+-.B @sysconfdir@/aide.conf
++.B /etc/aide.conf
+ Default aide configuration file.
+-.B @sysconfdir@/aide.db
++.B /var/lib/aide/aide.db.gz
+ Default aide database.
+-.B @sysconfdir@/aide.db.new
++.B /var/lib/aide/aide.db.new.gz
+ Default aide output database.
+ .SH SEE ALSO
+ .BR aide.conf (5)
