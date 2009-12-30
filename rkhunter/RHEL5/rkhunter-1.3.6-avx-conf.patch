@@ -29,14 +29,3 @@
  
  # Set to have the logfile appended to rather than overwritten.
  APPEND_LOG=0
---- files/os.dat.avx-conf	2009-04-18 19:30:53.000000000 +0400
-+++ files/os.dat	2009-04-18 19:32:04.000000000 +0400
-@@ -216,6 +216,8 @@ OS id:OS Description:Location of md5:Loc
- 747:Red Hat Enterprise Linux ES release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
- 747:Red Hat Enterprise Linux WS release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
- 747:Red Hat Enterprise Linux AS release 3 (Taroon Update 9):/usr/bin/md5sum:/bin:
-+748:CentOS release 5.2 (Final):/usr/bin/md5sum:/bin:
-+749:CentOS release 5.3 (Final):/usr/bin/md5sum:/bin:
- 800:Ipcop 1.4.11:/usr/bin/md5sum:/bin:
- 801:CentOS release 3.8 (Final):/usr/bin/md5sum:/bin:
- 802:Slackware 11.0.0:/bin/md5sum:/bin:

@@ -8,7 +8,7 @@
 # $Id$
 
 %define name		rkhunter
-%define version		1.3.4
+%define version		1.3.6
 %define release		1%{?dist}%{?rescue_rel}
 
 Summary:	Rootkit scans for rootkits, backdoors and local exploits
@@ -19,7 +19,7 @@ License:	GPLv2+
 Group:		System/Configuration
 URL:		http://www.rootkit.nl/projects/rootkit_hunter.html
 Source0:	http://download.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-Patch0:		rkhunter-1.3.4-avx-conf.patch
+Patch0:		rkhunter-1.3.6-avx-conf.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 BuildArch:	noarch
@@ -44,7 +44,7 @@ exploits by running tests like:
 %setup -q
 %patch0 -p0 -b .avx-conf
 
-chmod a+r files/{README,WISHLIST,CHANGELOG}
+chmod a+r files/{README,CHANGELOG}
 
 
 %install
@@ -68,7 +68,7 @@ install -m 0644 files/rkhunter.8 %{buildroot}%{_mandir}/man8
 
 %files
 %defattr(-,root,root)
-%doc files/CHANGELOG files/README files/WISHLIST
+%doc files/CHANGELOG files/README 
 %config(noreplace) %{_sysconfdir}/rkhunter.conf
 %{_sbindir}/*
 %dir %{_var}/lib/%{name}
@@ -81,6 +81,9 @@ install -m 0644 files/rkhunter.8 %{buildroot}%{_mandir}/man8
 
 
 %changelog
+* Wed Dec 30 2009 Vincent Danen <vdanen-at-build.annvix.org> 1.3.6
+- 1.3.6
+
 * Sat Apr 18 2009 Vincent Danen <vdanen-at-build.annvix.org> 1.3.4
 - 1.3.4
 - first build for CentOS/RHEL 5
