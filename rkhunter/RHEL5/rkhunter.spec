@@ -83,6 +83,7 @@ install -m 0644 files/rkhunter.8 %{buildroot}%{_mandir}/man8
 %changelog
 * Wed Dec 30 2009 Vincent Danen <vdanen-at-build.annvix.org> 1.3.6
 - 1.3.6
+- remove use of Digest::SHA::PurePerl to avoid dependencies
 
 * Sat Apr 18 2009 Vincent Danen <vdanen-at-build.annvix.org> 1.3.4
 - 1.3.4

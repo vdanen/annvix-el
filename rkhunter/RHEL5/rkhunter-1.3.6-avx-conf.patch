@@ -29,3 +29,21 @@
  
  # Set to have the logfile appended to rather than overwritten.
  APPEND_LOG=0
+--- files/filehashsha.pl.org	2009-12-30 21:30:27.000000000 +0300
++++ files/filehashsha.pl	2009-12-30 21:30:39.000000000 +0300
+@@ -16,14 +16,10 @@ if ($mod eq 'SHA1') {
+ 	use Digest::SHA1;
+ 	$sha = Digest::SHA1 -> new;
+ }
+-elsif ($mod eq 'SHA256') {
++else ($mod eq 'SHA256') {
+ 	use Digest::SHA256;
+ 	$sha = Digest::SHA256::new($size);
+ }
+-else {
+-	use Digest::SHA::PurePerl;
+-	$sha = Digest::SHA::PurePerl -> new($size);
+-}
+ 
+ # Hash file contents
+ while (<FILE>) {
