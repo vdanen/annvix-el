@@ -37,7 +37,7 @@
 %define libedit 0
 
 # Do we want NSS tokens support
-%define nss 1
+%define nss 0
 
 # Whether or not /sbin/nologin exists.
 %define nologin 1
@@ -72,7 +72,7 @@
 
 Summary: The OpenSSH implementation of SSH protocol versions 1 and 2
 Name: openssh
-Version: 5.3p1
+Version: 5.4p1
 Release: 1%{?dist}%{?rescue_rel}
 URL: http://www.openssh.com/portable.html
 #Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
@@ -84,26 +84,24 @@ Source0: openssh-%{version}-noacss.tar.bz2
 Source1: openssh-nukeacss.sh
 Source2: sshd.pam
 Source3: sshd.init
-Patch0: openssh-5.2p1-redhat.patch
+Patch0: openssh-5.4p1-redhat.patch
 Patch2: openssh-5.3p1-skip-initial.patch
 Patch4: openssh-5.2p1-vendor.patch
-Patch12: openssh-5.2p1-selinux.patch
-Patch13: openssh-5.1p1-mls.patch
-Patch16: openssh-5.3p1-audit.patch
+Patch12: openssh-5.4p1-selinux.patch
+Patch13: openssh-5.4p1-mls.patch
+Patch16: openssh-5.4p1-audit.patch
 Patch17: openssh-4.3p2-cve-2007-3102.patch
 Patch18: openssh-5.0p1-pam_selinux.patch
-Patch22: openssh-3.9p1-askpass-keep-above.patch
 Patch24: openssh-4.3p1-fromto-remote.patch
 Patch27: openssh-5.1p1-log-in-chroot.patch
 Patch30: openssh-4.0p1-exit-deadlock.patch
 Patch35: openssh-5.1p1-askpass-progress.patch
 Patch38: openssh-4.3p2-askpass-grab-info.patch
-Patch39: openssh-4.3p2-no-v6only.patch
+Patch39: openssh-5.4p1-no-v6only.patch
 Patch44: openssh-4.3p2-allow-ip-opts.patch
 Patch49: openssh-4.3p2-gssapi-canohost.patch
 Patch51: openssh-5.2p1-nss-keys.patch
 Patch54: openssh-5.1p1-gssapi-role.patch
-Patch55: openssh-5.1p1-cloexec.patch
 Patch62: openssh-5.1p1-scp-manpage.patch
 
 License: BSD
@@ -222,7 +220,6 @@ an X11 passphrase dialog for OpenSSH.
 %patch18 -p1 -b .pam_selinux
 %endif
 
-%patch22 -p1 -b .keep-above
 %patch24 -p1 -b .fromto-remote
 %patch27 -p1 -b .log-chroot
 %patch30 -p1 -b .exit-deadlock
@@ -231,9 +228,8 @@ an X11 passphrase dialog for OpenSSH.
 %patch39 -p1 -b .no-v6only
 %patch44 -p1 -b .ip-opts
 %patch49 -p1 -b .canohost
-%patch51 -p1 -b .nss-keys
+#%patch51 -p1 -b .nss-keys
 %patch54 -p1 -b .gssapi-role
-%patch55 -p1 -b .cloexec
 %patch62 -p1 -b .manpage
 
 autoreconf
@@ -455,11 +451,13 @@ fi
 %attr(0755,root,root) %{_bindir}/ssh-keyscan
 %attr(0755,root,root) %{_bindir}/sftp
 %attr(0755,root,root) %{_bindir}/ssh-copy-id
+%attr(0755,root,root) %{_libexecdir}/openssh/ssh-pkcs11-helper
 %attr(0644,root,root) %{_mandir}/man1/ssh-agent.1*
 %attr(0644,root,root) %{_mandir}/man1/ssh-add.1*
 %attr(0644,root,root) %{_mandir}/man1/ssh-keyscan.1*
 %attr(0644,root,root) %{_mandir}/man1/sftp.1*
 %attr(0644,root,root) %{_mandir}/man1/ssh-copy-id.1*
+%attr(0644,root,root) %{_mandir}/man8/ssh-pkcs11-helper.8*
 %endif
 
 %if ! %{rescue}
@@ -486,6 +484,12 @@ fi
 %endif
 
 %changelog
+* Thu Mar 11 2010 Vincent Danen <vdanen-at-build.annvix.org> 5.4p1-1.el5.avx
+- 5.4p1
+- rediff P0, P12, P13, P16, P39
+- drop P22 and P55, merged upstream
+- disable nss support for now, P51 is too much to forward-port
+
 * Thu Oct 1 2009 Vincent Danen <vdanen-at-build.annvix.org> 5.3p1-1.el5.avx
 - 5.3p1
 - rediff P2, P16

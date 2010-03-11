@@ -1,0 +1,11 @@
+--- openssh-5.4p1/channels.c.no-v6only	2010-03-11 19:58:23.000000000 +0300
++++ openssh-5.4p1/channels.c	2010-03-11 20:04:45.000000000 +0300
+@@ -3266,7 +3266,7 @@ x11_create_display_inet(int x11_display_
+ 					continue;
+ 				}
+ 			}
+-			if (ai->ai_family == AF_INET6)
++			if (x11_use_localhost && ai->ai_family == AF_INET6)
+ 				sock_set_v6only(sock);
+ 			if (x11_use_localhost)
+ 				channel_set_reuseaddr(sock);

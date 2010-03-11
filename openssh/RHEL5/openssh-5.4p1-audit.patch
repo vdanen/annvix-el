@@ -1,6 +1,6 @@
---- openssh-5.3p1/configure.ac.audit	2009-10-01 18:39:19.000000000 +0400
-+++ openssh-5.3p1/configure.ac	2009-10-01 18:39:19.000000000 +0400
-@@ -3409,6 +3409,18 @@ AC_ARG_WITH(selinux,
+--- openssh-5.4p1/configure.ac.audit	2010-03-11 19:54:15.000000000 +0300
++++ openssh-5.4p1/configure.ac	2010-03-11 19:54:15.000000000 +0300
+@@ -3365,6 +3365,18 @@ AC_ARG_WITH(selinux,
  	fi ]
  )
  
@@ -19,7 +19,7 @@
  # Check whether user wants Kerberos 5 support
  KRB5_MSG="no"
  AC_ARG_WITH(kerberos5,
-@@ -4234,6 +4246,7 @@ echo "                       PAM support
+@@ -4190,6 +4202,7 @@ echo "                       PAM support
  echo "                   OSF SIA support: $SIA_MSG"
  echo "                 KerberosV support: $KRB5_MSG"
  echo "                   SELinux support: $SELINUX_MSG"
@@ -27,8 +27,8 @@
  echo "                 Smartcard support: $SCARD_MSG"
  echo "                     S/KEY support: $SKEY_MSG"
  echo "              TCP Wrappers support: $TCPW_MSG"
---- openssh-5.3p1/loginrec.c.audit	2009-02-12 05:12:22.000000000 +0300
-+++ openssh-5.3p1/loginrec.c	2009-10-01 18:39:19.000000000 +0400
+--- openssh-5.4p1/loginrec.c.audit	2010-01-09 10:18:04.000000000 +0300
++++ openssh-5.4p1/loginrec.c	2010-03-11 19:54:15.000000000 +0300
 @@ -176,6 +176,10 @@
  #include "auth.h"
  #include "buffer.h"
@@ -113,8 +113,8 @@
  /**
   ** Low-level libutil login() functions
   **/
---- openssh-5.3p1/config.h.in.audit	2009-09-26 10:31:14.000000000 +0400
-+++ openssh-5.3p1/config.h.in	2009-10-01 18:42:10.000000000 +0400
+--- openssh-5.4p1/config.h.in.audit	2010-03-08 03:30:57.000000000 +0300
++++ openssh-5.4p1/config.h.in	2010-03-11 19:55:57.000000000 +0300
 @@ -1415,6 +1415,9 @@
  /* Define if you want SELinux support. */
  #undef WITH_SELINUX
@@ -122,12 +122,12 @@
 +/* Define if you want Linux audit support. */
 +#undef HAVE_LINUX_AUDIT
 +
- /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
-    significant byte first (like Motorola and SPARC, unlike Intel). */
- #if defined AC_APPLE_UNIVERSAL_BUILD
---- openssh-5.3p1/auth.c.audit	2008-11-05 08:12:54.000000000 +0300
-+++ openssh-5.3p1/auth.c	2009-10-01 18:39:19.000000000 +0400
-@@ -287,6 +287,12 @@ auth_log(Authctxt *authctxt, int authent
+ /* Define to 1 if your processor stores words with the most significant byte
+    first (like Motorola and SPARC, unlike Intel and VAX). */
+ #undef WORDS_BIGENDIAN
+--- openssh-5.4p1/auth.c.audit	2010-03-07 03:57:00.000000000 +0300
++++ openssh-5.4p1/auth.c	2010-03-11 19:54:15.000000000 +0300
+@@ -293,6 +293,12 @@ auth_log(Authctxt *authctxt, int authent
  		    get_canonical_hostname(options.use_dns), "ssh", &loginmsg);
  # endif
  #endif
@@ -140,7 +140,7 @@
  #ifdef SSH_AUDIT_EVENTS
  	if (authenticated == 0 && !authctxt->postponed)
  		audit_event(audit_classify_auth(method));
-@@ -533,6 +539,10 @@ getpwnamallow(const char *user)
+@@ -564,6 +570,10 @@ getpwnamallow(const char *user)
  		record_failed_login(user,
  		    get_canonical_hostname(options.use_dns), "ssh");
  #endif
@@ -151,8 +151,8 @@
  #ifdef SSH_AUDIT_EVENTS
  		audit_event(SSH_INVALID_USER);
  #endif /* SSH_AUDIT_EVENTS */
---- openssh-5.3p1/loginrec.h.audit	2006-08-05 06:39:40.000000000 +0400
-+++ openssh-5.3p1/loginrec.h	2009-10-01 18:39:19.000000000 +0400
+--- openssh-5.4p1/loginrec.h.audit	2006-08-05 06:39:40.000000000 +0400
++++ openssh-5.4p1/loginrec.h	2010-03-11 19:54:15.000000000 +0300
 @@ -127,5 +127,9 @@ char *line_stripname(char *dst, const ch
  char *line_abbrevname(char *dst, const char *src, int dstsize);
  

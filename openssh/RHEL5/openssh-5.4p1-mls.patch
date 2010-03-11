@@ -1,35 +1,19 @@
-diff -up openssh-5.1p1/misc.c.mls openssh-5.1p1/misc.c
---- openssh-5.1p1/misc.c.mls	2008-06-13 06:48:59.000000000 +0200
-+++ openssh-5.1p1/misc.c	2008-07-23 18:53:37.000000000 +0200
-@@ -427,6 +427,7 @@ char *
- colon(char *cp)
- {
- 	int flag = 0;
-+	int start = 1;
- 
- 	if (*cp == ':')		/* Leading colon is part of file name. */
- 		return (0);
-@@ -440,8 +441,13 @@ colon(char *cp)
- 			return (cp+1);
- 		if (*cp == ':' && !flag)
- 			return (cp);
--		if (*cp == '/')
--			return (0);
-+		if (start) {
-+		/* Slash on beginning or after dots only denotes file name. */
-+			if (*cp == '/')
-+				return (0);
-+			if (*cp != '.')
-+				start = 0;
-+		}
+--- openssh-5.4p1/sshd.c.mls	2010-03-11 19:50:14.000000000 +0300
++++ openssh-5.4p1/sshd.c	2010-03-11 19:50:14.000000000 +0300
+@@ -1988,6 +1988,9 @@ main(int ac, char **av)
+ 		restore_uid();
  	}
- 	return (0);
- }
-diff -up openssh-5.1p1/session.c.mls openssh-5.1p1/session.c
---- openssh-5.1p1/session.c.mls	2008-06-16 15:29:18.000000000 +0200
-+++ openssh-5.1p1/session.c	2008-07-23 18:53:37.000000000 +0200
-@@ -1550,10 +1550,6 @@ do_setusercontext(struct passwd *pw)
  #endif
++#ifdef WITH_SELINUX
++	ssh_selinux_setup_exec_context(authctxt->pw->pw_name);
++#endif
+ #ifdef USE_PAM
+ 	if (options.use_pam) {
+ 		do_pam_setcred(1);
+--- openssh-5.4p1/session.c.mls	2010-03-07 15:05:17.000000000 +0300
++++ openssh-5.4p1/session.c	2010-03-11 19:50:14.000000000 +0300
+@@ -1575,10 +1575,6 @@ do_setusercontext(struct passwd *pw)
+ 
  	if (getuid() != pw->pw_uid || geteuid() != pw->pw_uid)
  		fatal("Failed to set uids to %u.", (u_int) pw->pw_uid);
 -
@@ -39,15 +23,25 @@ diff -up openssh-5.1p1/session.c.mls openssh-5.1p1/session.c
  }
  
  static void
-diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-compat/port-linux.c
---- openssh-5.1p1/openbsd-compat/port-linux.c.mls	2008-07-23 18:53:37.000000000 +0200
-+++ openssh-5.1p1/openbsd-compat/port-linux.c	2008-07-23 18:53:37.000000000 +0200
-@@ -33,12 +33,23 @@
+--- openssh-5.4p1/configure.ac.mls	2010-03-11 19:50:14.000000000 +0300
++++ openssh-5.4p1/configure.ac	2010-03-11 19:50:14.000000000 +0300
+@@ -3360,6 +3360,7 @@ AC_ARG_WITH(selinux,
+ 		SSHDLIBS="$SSHDLIBS $LIBSELINUX"
+ 		LIBS="$LIBS $LIBSELINUX"
+ 		AC_CHECK_FUNCS(getseuserbyname get_default_context_with_level)
++		AC_CHECK_FUNCS(setkeycreatecon)
+ 		LIBS="$save_LIBS"
+ 	fi ]
+ )
+--- openssh-5.4p1/openbsd-compat/port-linux.c.mls	2010-03-11 19:50:14.000000000 +0300
++++ openssh-5.4p1/openbsd-compat/port-linux.c	2010-03-11 19:52:05.000000000 +0300
+@@ -35,13 +35,24 @@
  #include "key.h"
  #include "hostfile.h"
  #include "auth.h"
 +#include "xmalloc.h"
  
+ #ifdef WITH_SELINUX
  #include <selinux/selinux.h>
  #include <selinux/flask.h>
 +#include <selinux/context.h>
@@ -66,7 +60,7 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  
  /* Wrapper around is_selinux_enabled() to log its return value once only */
  int
-@@ -54,17 +65,173 @@ ssh_selinux_enabled(void)
+@@ -57,17 +68,173 @@ ssh_selinux_enabled(void)
  	return (enabled);
  }
  
@@ -246,7 +240,7 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  #ifdef HAVE_GETSEUSERBYNAME
  	if ((r=getseuserbyname(pwname, &sename, &lvl)) != 0) {
  		sename = NULL;
-@@ -72,38 +239,63 @@ ssh_selinux_getctxbyname(char *pwname)
+@@ -75,38 +242,63 @@ ssh_selinux_getctxbyname(char *pwname)
  	}
  #else
  	sename = pwname;
@@ -332,7 +326,7 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  
  #ifdef HAVE_GETSEUSERBYNAME
  	if (sename != NULL)
-@@ -111,14 +303,20 @@ ssh_selinux_getctxbyname(char *pwname)
+@@ -114,14 +306,20 @@ ssh_selinux_getctxbyname(char *pwname)
  	if (lvl != NULL)
  		xfree(lvl);
  #endif
@@ -354,7 +348,7 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  	security_context_t user_ctx = NULL;
  
  	if (!ssh_selinux_enabled())
-@@ -126,22 +324,45 @@ ssh_selinux_setup_exec_context(char *pwn
+@@ -129,22 +327,45 @@ ssh_selinux_setup_exec_context(char *pwn
  
  	debug3("%s: setting execution context", __func__);
  
@@ -407,7 +401,7 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  
  	debug3("%s: done", __func__);
  }
-@@ -159,7 +380,10 @@ ssh_selinux_setup_pty(char *pwname, cons
+@@ -162,7 +383,10 @@ ssh_selinux_setup_pty(char *pwname, cons
  
  	debug3("%s: setting TTY context on %s", __func__, tty);
  
@@ -419,27 +413,29 @@ diff -up openssh-5.1p1/openbsd-compat/port-linux.c.mls openssh-5.1p1/openbsd-com
  
  	/* XXX: should these calls fatal() upon failure in enforcing mode? */
  
-diff -up openssh-5.1p1/configure.ac.mls openssh-5.1p1/configure.ac
---- openssh-5.1p1/configure.ac.mls	2008-07-23 18:53:37.000000000 +0200
-+++ openssh-5.1p1/configure.ac	2008-07-23 18:53:37.000000000 +0200
-@@ -3311,6 +3311,7 @@ AC_ARG_WITH(selinux,
- 		SSHDLIBS="$SSHDLIBS $LIBSELINUX"
- 		LIBS="$LIBS $LIBSELINUX"
- 		AC_CHECK_FUNCS(getseuserbyname get_default_context_with_level)
-+		AC_CHECK_FUNCS(setkeycreatecon)
- 		LIBS="$save_LIBS"
- 	fi ]
- )
-diff -up openssh-5.1p1/sshd.c.mls openssh-5.1p1/sshd.c
---- openssh-5.1p1/sshd.c.mls	2008-07-23 18:53:37.000000000 +0200
-+++ openssh-5.1p1/sshd.c	2008-07-23 18:53:37.000000000 +0200
-@@ -1896,6 +1896,9 @@ main(int ac, char **av)
- 		restore_uid();
+--- openssh-5.4p1/misc.c.mls	2010-01-10 02:31:12.000000000 +0300
++++ openssh-5.4p1/misc.c	2010-03-11 19:50:14.000000000 +0300
+@@ -423,6 +423,7 @@ char *
+ colon(char *cp)
+ {
+ 	int flag = 0;
++	int start = 1;
+ 
+ 	if (*cp == ':')		/* Leading colon is part of file name. */
+ 		return (0);
+@@ -436,8 +437,13 @@ colon(char *cp)
+ 			return (cp+1);
+ 		if (*cp == ':' && !flag)
+ 			return (cp);
+-		if (*cp == '/')
+-			return (0);
++		if (start) {
++		/* Slash on beginning or after dots only denotes file name. */
++			if (*cp == '/')
++				return (0);
++			if (*cp != '.')
++				start = 0;
++		}
  	}
- #endif
-+#ifdef WITH_SELINUX
-+	ssh_selinux_setup_exec_context(authctxt->pw->pw_name);
-+#endif
- #ifdef USE_PAM
- 	if (options.use_pam) {
- 		do_pam_setcred(1);
+ 	return (0);
+ }
