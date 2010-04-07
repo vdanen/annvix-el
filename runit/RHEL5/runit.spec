@@ -8,13 +8,19 @@
 # $Id$
 
 %define	name		runit
-%define	version		2.0.0
+%define	version		2.1.1
 %define	release		1%{?dist}%{?rescue_rel}
 
 %define aver		0.20
 
 %define _runitddir      %{_sysconfdir}/runit.d
 %define _srvdir         %{_var}/service
+
+%define logger_uid      67
+%define logger_gid      67
+
+%define use_init        1
+%define use_upstart     0
 
 Summary:	A UN*X init scheme with service supervision
 Name:		%{name}
@@ -26,6 +32,7 @@ URL:		http://smarden.org/runit/
 Source0:	http://smarden.org/runit/%{name}-%{version}.tar.gz
 # available from http://annvix.org/cg-bin/viewcvs.cgi/tools/runit/
 Source1:	annvix-runit-%{aver}.tar.bz2
+Source2:        upstart-runsvdir.conf
 Patch0:		runit-1.3.1-avx-localtime.patch
 Patch1:		runit-1.6.0-avx-svlogd_perms.patch
 
@@ -39,7 +46,10 @@ Requires:	mingetty
 Requires:	execline
 Requires:	ipsvd
 Requires:	psmisc
-Conflicts:	SysVinit <= 2.85-6avx
+Requires:       /sbin/nologin
+%if %{use_upstart}
+Requires:       upstart
+%endif
 
 %description
 runit is a daemontools-like replacement for SysV-init and other
@@ -88,13 +98,20 @@ popd
 
 install -m 0644 %{name}-%{version}/man/*.8 %{buildroot}%{_mandir}/man8/
 
+%if %{use_upstart}
+mkdir -p %{buildroot}%{_sysconfdir}/event.d
+install %{SOURCE2} %{buildroot}%{_sysconfdir}/event.d/runsvdir.conf
+%endif
+
 
 %clean
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
 
 %pre
-### create logger user
+# create logger user
+/usr/sbin/useradd -c "runit logger" -u %{logger_uid} \
+        -s /sbin/nologin -r -d /var/log/supervise logger 2> /dev/null || :
 
 # in order for runit to properly handle our reboot/halt signals, we need to
 # make a copy of runit, but the inode must remain identical so we do this by
@@ -111,58 +128,20 @@ fi
 
 
 %post
+%if %{use_init}
 if [ $1 == "1" ]; then
-    # this is a new install, we need to setup the gettys
-    for i in 2 3 4 5 6
-    do
-	echo "Setting up the mingetty service for tty$i..."
-        ln -s /var/service/mingetty-tty${i} /etc/runlevels/default/service/mingetty-tty${i}
-        ln -s /var/service/mingetty-tty${i} /etc/runlevels/single/service/mingetty-tty${i}
-        # even though this may cause some grief for existing non-runit systems, we need
-        # to remove the down file because on a new install, the user would reboot into a
-        # system with no gettys
-        rm -f /etc/runlevels/default/service/mingetty-tty$i/down
-        rm -f /etc/runlevels/single/service/mingetty-tty$i/down
-    done
+    # new install requires changes to inittab
+    if [ "$(grep -q runit /etc/inittab; echo $?)" == "1" ]; then
+        echo "SV:123456:respawn:/etc/runit/2" >>/etc/inittab
+        /sbin/init q
+    fi
 fi
-
-
-%triggerun -- chkconfig
-exit
-# we have to get rather wierd here due to how rpm orders transactions.  runit will
-# always get installed before chkconfig is removed, which means /etc/init.d won't
-# be created properly because it already exists
-if [ -L /etc/init.d ]; then
-    echo "Cleaning up the removal of chkconfig..."
-    dir=`mktemp -d /tmp/runit.XXXXXX`
-    mv /etc/init.d/* ${dir}
-    rm -f /etc/init.d
-    mkdir %{_initrddir} && chown root:admin %{_initrddir} && chmod 0750 %{_initrddir}
-    mv ${dir}/* %{_initrddir}/
-    # /etc/rc.d is no longer used and should be empty except for some dangling symlinks
-    # from chkconfig
-    rm -rf /etc/rc.d
-    rmdir ${dir}
-    # finally, there is nothing in our default runlevel and we should at least have
-    # network support and a few others dependening on if they're installed already
-    for service in network netfs kudzu iptables shorewall rc.local; do
-        if [ -f %{_initrddir}/${service} ]; then
-            /sbin/rc-update add ${service} default
-        fi
-    done
+%endif
+%if %{use_upstart}
+if [ $1 == "1" ]; then
+    /sbin/start runsvdir
 fi
-# now we need to populate the runlevels if /service exists
-if [ -d /service ]; then
-    echo "Moving service directories..."
-    cp -a /service/* %{_sysconfdir}/runlevels/default/service/
-    rm -rf /service && ln -s %{_sysconfdir}/runlevels/default/service /service
-    pushd %{_sysconfdir}/runlevels/single/service >/dev/null 2>&1
-        ln -s /var/service/mingetty* .
-        ln -s /var/service/socklog-unix .
-        ln -s /var/service/socklog-klog .
-        ln -s /var/service/crond .
-    popd >/dev/null 2>&1
-fi
+%endif
 
 
 %files
@@ -189,6 +168,9 @@ fi
 %attr(0700,root,root) /sbin/rc-update
 %attr(0700,root,root) /sbin/convert-envdir
 %attr(0644,root,root) %{_mandir}/man8/*.8*
+%if %{use_upstart}
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/event.d/runsvdir.conf
+%endif
 %attr(0700,root,root) %dir %{_sysconfdir}/runit
 %attr(0700,root,root) %{_sysconfdir}/runit/1
 %attr(0700,root,root) %{_sysconfdir}/runit/2
@@ -227,6 +209,13 @@ fi
 
 
 %changelog
+* Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
+- 2.1.1
+- create logger user (static uid/gid: 67)
+- requires /sbin/nologin
+- handle modifications to inittab (%%use_init) or adding upstart config file
+  (%%use_upstart), so that it will work with existing SysVinit or upstart
+
 * Sun Apr 19 2009 Vincent Danen <vdanen-at-build.annvix.org> 2.0.0
 - 2.0.0
 
