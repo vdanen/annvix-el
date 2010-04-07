@@ -8,7 +8,7 @@
 # $Id$
 
 %define	name		ipsvd
-%define	version		0.13.0
+%define	version		1.0.0
 %define	release         1%{?dist}%{?rescue_rel}	
 
 Summary:	Internet protocol service daemons
@@ -109,11 +109,11 @@ echo "20" >%{buildroot}%{_sysconfdir}/sysconfig/env/tcpsvd/MAX_BACKLOG
 %doc %{name}-%{version}/package/README
 %doc %{name}-%{version}/doc/*.html
 %dir %{_sysconfdir}/sysconfig/env/tcpsvd
-%attr(0640,root,admin) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/HOSTNAME
-%attr(0640,root,admin) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/IP
-%attr(0640,root,admin) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_CONN
-%attr(0640,root,admin) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_PER_HOST
-%attr(0640,root,admin) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_BACKLOG
+%attr(0640,root,wheel) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/HOSTNAME
+%attr(0640,root,wheel) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/IP
+%attr(0640,root,wheel) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_CONN
+%attr(0640,root,wheel) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_PER_HOST
+%attr(0640,root,wheel) %config(noreplace) %{_sysconfdir}/sysconfig/env/tcpsvd/MAX_BACKLOG
 %attr(0755,root,root) /sbin/ipsvd-cdb
 %attr(0755,root,root) /sbin/sslio
 %attr(0755,root,root) /sbin/sslsvd
@@ -129,6 +129,11 @@ echo "20" >%{buildroot}%{_sysconfdir}/sysconfig/env/tcpsvd/MAX_BACKLOG
 
 
 %changelog
+* Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 1.0.0
+- 1.0.0
+- use group wheel, not admin (group admin does not exist, wheel is the 
+  closest to it)
+
 * Fri Apr 17 2009 Vincent Danen <vdanen-at-build.annvix.org> 0.13.0
 - first build for CentOS/RHEL 5
 
