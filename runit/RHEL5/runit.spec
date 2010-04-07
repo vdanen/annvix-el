@@ -9,9 +9,9 @@
 
 %define	name		runit
 %define	version		2.1.1
-%define	release		3%{?dist}%{?rescue_rel}
+%define	release		4%{?dist}%{?rescue_rel}
 
-%define aver		0.90
+%define aver		0.90.1
 
 %define _runitddir      %{_sysconfdir}/runit.d
 %define _srvdir         %{_var}/service
@@ -173,6 +173,9 @@ fi
 
 
 %changelog
+* Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
+- annvix-runit 0.90.1
+
 * Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
 - use group wheel, not admin (group admin does not exist, wheel is the
   closest to it)
