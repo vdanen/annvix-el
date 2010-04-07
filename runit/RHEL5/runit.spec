@@ -9,15 +9,12 @@
 
 %define	name		runit
 %define	version		2.1.1
-%define	release		2%{?dist}%{?rescue_rel}
+%define	release		3%{?dist}%{?rescue_rel}
 
-%define aver		0.20
+%define aver		0.90
 
 %define _runitddir      %{_sysconfdir}/runit.d
 %define _srvdir         %{_var}/service
-
-%define logger_uid      67
-%define logger_gid      67
 
 %define use_init        1
 %define use_upstart     0
@@ -84,7 +81,7 @@ popd
 %install
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
-mkdir -p %{buildroot}/{service,sbin,%{_mandir}/man8}
+mkdir -p %{buildroot}/{service,sbin,%{_mandir}/man8,%{_sysconfdir}/sysconfig/env,%{_var}/log/service}
 
 pushd %{name}-%{version}
     for i in `cat package/commands` svwaitup svwaitdown; do
@@ -110,8 +107,7 @@ install %{SOURCE2} %{buildroot}%{_sysconfdir}/event.d/runsvdir.conf
 
 %pre
 # create logger user
-/usr/sbin/useradd -c "runit logger" -u %{logger_uid} \
-        -s /sbin/nologin -r -d /var/log/supervise logger 2> /dev/null || :
+/usr/sbin/useradd -c "runit logger" -s /sbin/nologin -r -d /var/log/service logger 2> /dev/null || :
 
 # in order for runit to properly handle our reboot/halt signals, we need to
 # make a copy of runit, but the inode must remain identical so we do this by
@@ -132,7 +128,7 @@ fi
 if [ $1 == "1" ]; then
     # new install requires changes to inittab
     if [ "$(grep -q runit /etc/inittab; echo $?)" == "1" ]; then
-        echo "SV:123456:respawn:/etc/runit/2" >>/etc/inittab
+        echo "SV:123456:respawn:/etc/runit/runsvdir" >>/etc/inittab
         /sbin/init q
     fi
 fi
@@ -152,7 +148,6 @@ fi
 %doc %{name}-%{version}/doc/*.html
 %doc %{name}-%{version}/etc/2
 %doc %{name}-%{version}/etc/debian
-%dir %attr(0750,root,wheel) %{_runitddir}
 %attr(0700,root,root) /sbin/runit
 %attr(0700,root,root) /sbin/runit-init
 %attr(0755,root,root) /sbin/runsv
@@ -164,54 +159,28 @@ fi
 %attr(0755,root,root) /sbin/svwaitdown
 %attr(0755,root,root) /sbin/chpst
 %attr(0755,root,root) /sbin/utmpset
-%attr(0700,root,root) /sbin/rc
-%attr(0700,root,root) /sbin/rc-update
-%attr(0700,root,root) /sbin/convert-envdir
 %attr(0644,root,root) %{_mandir}/man8/*.8*
 %if %{use_upstart}
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/event.d/runsvdir.conf
 %endif
+%attr(0700,logger,logger) %dir %{_var}/log/service
 %attr(0700,root,root) %dir %{_sysconfdir}/runit
-%attr(0700,root,root) %{_sysconfdir}/runit/1
-%attr(0700,root,root) %{_sysconfdir}/runit/2
-%attr(0700,root,root) %{_sysconfdir}/runit/3
-%attr(0700,root,root) %{_sysconfdir}/runit/ctrlaltdel
-%attr(0750,root,root) %dir %{_sysconfdir}/sysconfig/env/clock
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/clock/UTC
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/clock/ZONE
-%attr(0750,root,root) %dir %{_sysconfdir}/sysconfig/env/network
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/network/GATEWAY
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/network/HOSTNAME
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/network/NETWORKING
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/usb/USB
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/usb/MOUSE
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/usb/KEYBOARD
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/usb/PRINTER
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/usb/STORAGE
+%attr(0700,root,root) %{_sysconfdir}/runit/runsvdir
 %dir %attr(0750,root,root) %{_srvdir}
 %dir %attr(0750,root,root) /service
 %{_srvdir}/*
-%dir %attr(0750,root,root) %{_sysconfdir}/sysconfig/env/runit
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/runit/STAGE_3_TIMEOUT
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/runit/GETTY_TIMEOUT
-%attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sysconfig/env/runit/CTRLALTDEL_TIMEOUT
-%attr(0750,root,root) %{_runitddir}/rc.functions.sh
-%attr(0750,root,root) %config(noreplace) %{_runitddir}/rc.local
-%attr(0750,root,root) %config(noreplace) %{_runitddir}/rc.local-stop
-%attr(0750,root,root) %{_runitddir}/consmap.sh
-%attr(0750,root,root) %{_runitddir}/netfs
-%attr(0750,root,root) %{_runitddir}/network
-%attr(0750,root,root) %{_runitddir}/usb
-%dir %attr(0750,root,root) %{_sysconfdir}/runlevels/default
-%dir %attr(0750,root,root) %{_sysconfdir}/runlevels/default/service
-%dir %attr(0750,root,root) %{_sysconfdir}/runlevels/single
-%dir %attr(0750,root,root) %{_sysconfdir}/runlevels/single/service
+%dir %attr(0750,root,root) %{_sysconfdir}/sysconfig/env
 
 
 %changelog
 * Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
 - use group wheel, not admin (group admin does not exist, wheel is the
   closest to it)
+- get rid of all the stand-alone runit stuff; no longer meant to run
+  standalone
+- own and create /var/log/service
+- can't use uid/gid 67 so have it created dynamically
+- annvix-runit 0.90
 
 * Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
 - 2.1.1
