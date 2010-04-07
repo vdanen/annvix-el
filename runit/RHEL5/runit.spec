@@ -9,7 +9,7 @@
 
 %define	name		runit
 %define	version		2.1.1
-%define	release		1%{?dist}%{?rescue_rel}
+%define	release		2%{?dist}%{?rescue_rel}
 
 %define aver		0.20
 
@@ -152,7 +152,7 @@ fi
 %doc %{name}-%{version}/doc/*.html
 %doc %{name}-%{version}/etc/2
 %doc %{name}-%{version}/etc/debian
-%dir %attr(0750,root,admin) %{_runitddir}
+%dir %attr(0750,root,wheel) %{_runitddir}
 %attr(0700,root,root) /sbin/runit
 %attr(0700,root,root) /sbin/runit-init
 %attr(0755,root,root) /sbin/runsv
@@ -209,6 +209,10 @@ fi
 
 
 %changelog
+* Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
+- use group wheel, not admin (group admin does not exist, wheel is the
+  closest to it)
+
 * Wed Apr 7 2010 Vincent Danen <vdanen-at-build.annvix.org> 2.1.1
 - 2.1.1
 - create logger user (static uid/gid: 67)
