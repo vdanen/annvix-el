@@ -1,30 +1,6 @@
---- openssh-5.4p1/sshd.c.mls	2010-03-11 19:50:14.000000000 +0300
-+++ openssh-5.4p1/sshd.c	2010-03-11 19:50:14.000000000 +0300
-@@ -1988,6 +1988,9 @@ main(int ac, char **av)
- 		restore_uid();
- 	}
- #endif
-+#ifdef WITH_SELINUX
-+	ssh_selinux_setup_exec_context(authctxt->pw->pw_name);
-+#endif
- #ifdef USE_PAM
- 	if (options.use_pam) {
- 		do_pam_setcred(1);
---- openssh-5.4p1/session.c.mls	2010-03-07 15:05:17.000000000 +0300
-+++ openssh-5.4p1/session.c	2010-03-11 19:50:14.000000000 +0300
-@@ -1575,10 +1575,6 @@ do_setusercontext(struct passwd *pw)
- 
- 	if (getuid() != pw->pw_uid || geteuid() != pw->pw_uid)
- 		fatal("Failed to set uids to %u.", (u_int) pw->pw_uid);
--
--#ifdef WITH_SELINUX
--	ssh_selinux_setup_exec_context(pw->pw_name);
--#endif
- }
- 
- static void
---- openssh-5.4p1/configure.ac.mls	2010-03-11 19:50:14.000000000 +0300
-+++ openssh-5.4p1/configure.ac	2010-03-11 19:50:14.000000000 +0300
+diff -up openssh-5.4p1/configure.ac.mls openssh-5.4p1/configure.ac
+--- openssh-5.4p1/configure.ac.mls	2010-03-01 15:24:27.000000000 +0100
++++ openssh-5.4p1/configure.ac	2010-03-01 15:24:28.000000000 +0100
 @@ -3360,6 +3360,7 @@ AC_ARG_WITH(selinux,
  		SSHDLIBS="$SSHDLIBS $LIBSELINUX"
  		LIBS="$LIBS $LIBSELINUX"
@@ -33,8 +9,36 @@
  		LIBS="$save_LIBS"
  	fi ]
  )
---- openssh-5.4p1/openbsd-compat/port-linux.c.mls	2010-03-11 19:50:14.000000000 +0300
-+++ openssh-5.4p1/openbsd-compat/port-linux.c	2010-03-11 19:52:05.000000000 +0300
+diff -up openssh-5.4p1/misc.c.mls openssh-5.4p1/misc.c
+--- openssh-5.4p1/misc.c.mls	2010-01-10 00:31:12.000000000 +0100
++++ openssh-5.4p1/misc.c	2010-03-01 15:24:28.000000000 +0100
+@@ -423,6 +423,7 @@ char *
+ colon(char *cp)
+ {
+ 	int flag = 0;
++	int start = 1;
+ 
+ 	if (*cp == ':')		/* Leading colon is part of file name. */
+ 		return (0);
+@@ -436,8 +437,13 @@ colon(char *cp)
+ 			return (cp+1);
+ 		if (*cp == ':' && !flag)
+ 			return (cp);
+-		if (*cp == '/')
+-			return (0);
++		if (start) {
++		/* Slash on beginning or after dots only denotes file name. */
++			if (*cp == '/')
++				return (0);
++			if (*cp != '.')
++				start = 0;
++		}
+ 	}
+ 	return (0);
+ }
+diff -up openssh-5.4p1/openbsd-compat/port-linux.c.mls openssh-5.4p1/openbsd-compat/port-linux.c
+--- openssh-5.4p1/openbsd-compat/port-linux.c.mls	2010-03-01 15:24:27.000000000 +0100
++++ openssh-5.4p1/openbsd-compat/port-linux.c	2010-03-01 15:25:50.000000000 +0100
 @@ -35,13 +35,24 @@
  #include "key.h"
  #include "hostfile.h"
@@ -413,29 +417,16 @@
  
  	/* XXX: should these calls fatal() upon failure in enforcing mode? */
  
---- openssh-5.4p1/misc.c.mls	2010-01-10 02:31:12.000000000 +0300
-+++ openssh-5.4p1/misc.c	2010-03-11 19:50:14.000000000 +0300
-@@ -423,6 +423,7 @@ char *
- colon(char *cp)
- {
- 	int flag = 0;
-+	int start = 1;
- 
- 	if (*cp == ':')		/* Leading colon is part of file name. */
- 		return (0);
-@@ -436,8 +437,13 @@ colon(char *cp)
- 			return (cp+1);
- 		if (*cp == ':' && !flag)
- 			return (cp);
--		if (*cp == '/')
--			return (0);
-+		if (start) {
-+		/* Slash on beginning or after dots only denotes file name. */
-+			if (*cp == '/')
-+				return (0);
-+			if (*cp != '.')
-+				start = 0;
-+		}
+diff -up openssh-5.4p1/sshd.c.mls openssh-5.4p1/sshd.c
+--- openssh-5.4p1/sshd.c.mls	2010-03-01 15:24:27.000000000 +0100
++++ openssh-5.4p1/sshd.c	2010-03-01 15:24:28.000000000 +0100
+@@ -1987,6 +1987,9 @@ main(int ac, char **av)
+ 		restore_uid();
  	}
- 	return (0);
- }
+ #endif
++#ifdef WITH_SELINUX
++	ssh_selinux_setup_exec_context(authctxt->pw->pw_name);
++#endif
+ #ifdef USE_PAM
+ 	if (options.use_pam) {
+ 		do_pam_setcred(1);

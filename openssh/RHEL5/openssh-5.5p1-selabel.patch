@@ -1,0 +1,50 @@
+--- openssh-5.5p1/Makefile.in.selabel	2010-03-14 00:41:34.000000000 +0300
++++ openssh-5.5p1/Makefile.in	2010-04-23 02:32:43.000000000 +0400
+@@ -139,7 +139,7 @@ libssh.a: $(LIBSSH_OBJS)
+ 	$(RANLIB) $@
+ 
+ ssh$(EXEEXT): $(LIBCOMPAT) libssh.a $(SSHOBJS)
+-	$(LD) -o $@ $(SSHOBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(LIBS)
++	$(LD) -o $@ $(SSHOBJS) $(LDFLAGS) -lssh -lopenbsd-compat -lselinux $(LIBS)
+ 
+ sshd$(EXEEXT): libssh.a	$(LIBCOMPAT) $(SSHDOBJS)
+ 	$(LD) -o $@ $(SSHDOBJS) $(LDFLAGS) -lssh -lopenbsd-compat $(SSHDLIBS) $(LIBS)
+--- openssh-5.5p1/contrib/ssh-copy-id.selabel	2010-03-26 03:18:28.000000000 +0300
++++ openssh-5.5p1/contrib/ssh-copy-id	2010-04-23 02:31:10.000000000 +0400
+@@ -38,7 +38,7 @@ if [ "$#" -lt 1 ] || [ "$1" = "-h" ] || 
+   exit 1
+ fi
+ 
+-{ eval "$GET_ID" ; } | ssh $1 "umask 077; test -d .ssh || mkdir .ssh ; cat >> .ssh/authorized_keys" || exit 1
++{ eval "$GET_ID" ; } | ssh $1 "umask 077; test -d .ssh || mkdir .ssh ; cat >> .ssh/authorized_keys; test -x /sbin/restorecon && /sbin/restorecon .ssh .ssh/authorized_keys" || exit 1
+ 
+ cat <<EOF
+ Now try logging into the machine, with "ssh '$1'", and check in:
+--- openssh-5.5p1/ssh.c.selabel	2010-02-26 23:55:06.000000000 +0300
++++ openssh-5.5p1/ssh.c	2010-04-23 02:57:58.000000000 +0400
+@@ -72,6 +72,7 @@
+ 
+ #include <openssl/evp.h>
+ #include <openssl/err.h>
++#include <selinux/selinux.h>
+ #include "openbsd-compat/openssl-compat.h"
+ #include "openbsd-compat/sys-queue.h"
+ 
+@@ -803,10 +804,15 @@ main(int ac, char **av)
+ 	 */
+ 	r = snprintf(buf, sizeof buf, "%s%s%s", pw->pw_dir,
+ 	    strcmp(pw->pw_dir, "/") ? "/" : "", _PATH_SSH_USER_DIR);
+-	if (r > 0 && (size_t)r < sizeof(buf) && stat(buf, &st) < 0)
++	if (r > 0 && (size_t)r < sizeof(buf) && stat(buf, &st) < 0) {
++		char *scon;
++
++		matchpathcon(buf, 0700, &scon);
++		setfscreatecon(scon);
+ 		if (mkdir(buf, 0700) < 0)
+ 			error("Could not create directory '%.200s'.", buf);
+-
++		setfscreatecon(NULL);
++	}
+ 	/* load options.identity_files */
+ 	load_public_identity_files();
+ 

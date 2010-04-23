@@ -72,7 +72,7 @@
 
 Summary: The OpenSSH implementation of SSH protocol versions 1 and 2
 Name: openssh
-Version: 5.4p1
+Version: 5.5p1
 Release: 1%{?dist}%{?rescue_rel}
 URL: http://www.openssh.com/portable.html
 #Source0: ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
@@ -88,21 +88,22 @@ Patch0: openssh-5.4p1-redhat.patch
 Patch2: openssh-5.3p1-skip-initial.patch
 Patch4: openssh-5.2p1-vendor.patch
 Patch12: openssh-5.4p1-selinux.patch
-Patch13: openssh-5.4p1-mls.patch
-Patch16: openssh-5.4p1-audit.patch
-Patch17: openssh-4.3p2-cve-2007-3102.patch
-Patch18: openssh-5.0p1-pam_selinux.patch
+Patch13: openssh-5.5p1-mls.patch
+Patch16: openssh-5.3p1-audit.patch
+Patch18: openssh-5.4p1-pam_selinux.patch
 Patch24: openssh-4.3p1-fromto-remote.patch
 Patch27: openssh-5.1p1-log-in-chroot.patch
 Patch30: openssh-4.0p1-exit-deadlock.patch
 Patch35: openssh-5.1p1-askpass-progress.patch
 Patch38: openssh-4.3p2-askpass-grab-info.patch
-Patch39: openssh-5.4p1-no-v6only.patch
-Patch44: openssh-4.3p2-allow-ip-opts.patch
+Patch44: openssh-5.2p1-allow-ip-opts.patch
 Patch49: openssh-4.3p2-gssapi-canohost.patch
-Patch51: openssh-5.2p1-nss-keys.patch
-Patch54: openssh-5.1p1-gssapi-role.patch
 Patch62: openssh-5.1p1-scp-manpage.patch
+Patch69: openssh-5.5p1-selabel.patch
+Patch71: openssh-5.2p1-edns.patch
+Patch72: openssh-5.4p1-pka.patch
+Patch74: openssh-5.3p1-randclean.patch
+Patch76: openssh-5.4p1-staterr.patch 
 
 License: BSD
 Group: Applications/Internet
@@ -216,7 +217,6 @@ an X11 passphrase dialog for OpenSSH.
 %patch12 -p1 -b .selinux
 %patch13 -p1 -b .mls
 %patch16 -p1 -b .audit
-%patch17 -p1 -b .inject-fix
 %patch18 -p1 -b .pam_selinux
 %endif
 
@@ -225,12 +225,14 @@ an X11 passphrase dialog for OpenSSH.
 %patch30 -p1 -b .exit-deadlock
 %patch35 -p1 -b .progress
 %patch38 -p1 -b .grab-info
-%patch39 -p1 -b .no-v6only
 %patch44 -p1 -b .ip-opts
 %patch49 -p1 -b .canohost
-#%patch51 -p1 -b .nss-keys
-%patch54 -p1 -b .gssapi-role
 %patch62 -p1 -b .manpage
+%patch69 -p1 -b .selabel
+%patch71 -p1 -b .edns
+%patch72 -p1 -b .pka
+%patch74 -p1 -b .randclean
+%patch76 -p1 -b .staterr
 
 autoreconf
 
@@ -274,6 +276,8 @@ fi
 	--enable-vendor-patchlevel="FC-%{version}-%{release}" \
 	--disable-strip \
 	--without-zlib-version-check \
+        --with-ssl-engine \
+        --with-pka \
 %if %{nss}
 	--with-nss \
 %endif
@@ -484,6 +488,11 @@ fi
 %endif
 
 %changelog
+* Thu Apr 22 2010 Vincent Danen <vdanen-at-build.annvix.org> 5.5p1-1.el5.avx
+- 5.5p1
+- sync up patches from Fedora except the gsskex and fips patches
+- rediff P69
+
 * Thu Mar 11 2010 Vincent Danen <vdanen-at-build.annvix.org> 5.4p1-1.el5.avx
 - 5.4p1
 - rediff P0, P12, P13, P16, P39
