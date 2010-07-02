@@ -8,7 +8,7 @@
 # $Id$
 
 %define name		rsec
-%define version		0.72.3
+%define version		0.72.4
 %define release		1%{?dist}%{?rescue_rel}
 
 Summary:	Security Reporting tool for Annvix
@@ -101,6 +101,9 @@ touch /var/log/security.log && chmod 0640 /var/log/security.log
 
 
 %changelog
+* Fri Jul 2 2010 Vincent Danen <vdanen-at-build.annvix.org> 0.72.4
+- 0.72.4
+
 * Sat Jun 5 2010 Vincent Danen <vdanen-at-build.annvix.org> 0.72.3
 - 0.72.3
 
